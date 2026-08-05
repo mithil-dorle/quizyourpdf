@@ -66,7 +66,7 @@ ${source}
       };
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error)) {
-        throw new Error("The AI couldn't shape a quiz from this PDF. Try another file.");
+        throw new Error("NOGEN: " + String((error as { text?: string }).text).slice(0, 400));
       }
       throw error;
     }
