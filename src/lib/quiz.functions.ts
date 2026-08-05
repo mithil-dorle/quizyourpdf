@@ -1,14 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
-import { streamText, Output, NoObjectGeneratedError } from "ai";
+import { streamText } from "ai";
 import { z } from "zod";
 
 const QuestionSchema = z.object({
   question: z.string(),
   options: z.array(z.string()),
   correctIndex: z.number(),
-  explanation: z.string(),
-  difficulty: z.string(),
-  topic: z.string(),
+  explanation: z.string().default(""),
+  difficulty: z.string().default("medium"),
+  topic: z.string().default("General"),
 });
 
 const QuizSchema = z.object({
