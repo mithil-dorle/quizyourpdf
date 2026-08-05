@@ -508,7 +508,7 @@ function Results({
 
       <div className="space-y-3">
         {quiz.questions.map((q, i) => {
-          const picked = answers[i];
+          const picked = answers[i] ?? null;
           const ok = picked === q.correctIndex;
           return (
             <div key={i} className="surface-card space-y-2 p-5">
