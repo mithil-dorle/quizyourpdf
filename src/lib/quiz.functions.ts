@@ -37,13 +37,13 @@ export const generateQuiz = createServerFn({ method: "POST" })
     const source = data.text.slice(0, 60000);
     const prompt = `You are a study-quiz generator. Read the document below and write exactly ${data.count} multiple-choice questions at "${data.difficulty}" difficulty.
 
+Reply with ONLY raw JSON (no markdown fences, no commentary) in exactly this shape:
+{"title": "short catchy quiz title", "questions": [{"question": "...", "options": ["a","b","c","d"], "correctIndex": 0, "explanation": "...", "difficulty": "easy|medium|hard", "topic": "1-4 words"}]}
+
 Rules:
 - Each question has exactly 4 options, exactly one correct.
 - correctIndex is the 0-based index of the correct option.
 - explanation: 1-2 punchy sentences saying WHY the answer is right (Gen-Z friendly, no cringe overload).
-- difficulty: one of "easy", "medium", "hard" for that specific question.
-- topic: 1-4 words naming the concept tested.
-- title: a short catchy quiz title based on the document.
 - Only use facts present in the document.
 
 DOCUMENT:
@@ -51,23 +51,43 @@ DOCUMENT:
 ${source}
 """`;
 
+    const result = streamText({
+      model: gateway("google/gemini-3-flash-preview"),
+      prompt,
+    });
+    const raw = await result.text;
+
+    const cleaned = raw
+      .trim()
+      .replace(/^```(?:json)?/i, "")
+      .replace(/```$/, "")
+      .trim();
+
+    let parsed: unknown;
     try {
-      const result = streamText({
-        model: gateway("google/gemini-3-flash-preview"),
-        prompt,
-        output: Output.object({ schema: QuizSchema }),
-      });
-      const quiz = (await result.output) as Quiz;
-      return {
-        ...quiz,
-        questions: quiz.questions
-          .filter((q) => q.options?.length >= 2)
-          .slice(0, data.count),
-      };
-    } catch (error) {
-      if (NoObjectGeneratedError.isInstance(error)) {
-        throw new Error("NOGEN: " + String((error as { text?: string }).text).slice(0, 400));
-      }
-      throw error;
+      parsed = JSON.parse(cleaned);
+    } catch {
+      const match = cleaned.match(/[[{][\s\S]*[\]}]/);
+      if (!match) throw new Error("The AI couldn't shape a quiz from this PDF. Try another file.");
+      parsed = JSON.parse(match[0]);
     }
+
+    const normalized = Array.isArray(parsed)
+      ? { title: "Your Quiz", questions: parsed }
+      : (parsed as { title?: unknown; questions?: unknown });
+
+    const quiz = QuizSchema.parse({
+      title: typeof normalized.title === "string" ? normalized.title : "Your Quiz",
+      questions: Array.isArray(normalized.questions) ? normalized.questions : [],
+    });
+
+    const questions = quiz.questions
+      .filter((q) => q.options.length >= 2 && q.correctIndex < q.options.length)
+      .slice(0, data.count);
+
+    if (!questions.length) {
+      throw new Error("The AI couldn't shape a quiz from this PDF. Try another file.");
+    }
+
+    return { ...quiz, questions };
   });
