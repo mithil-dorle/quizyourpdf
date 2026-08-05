@@ -1,24 +1,556 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  Brain,
+  Clock,
+  FileUp,
+  Flame,
+  Loader2,
+  RotateCcw,
+  Sparkles,
+  Target,
+  Trophy,
+  Zap,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { extractPdfText } from "@/lib/pdf";
+import { generateQuiz, type Quiz } from "@/lib/quiz.functions";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "QuizLab — Turn any PDF into a quiz game" },
+      {
+        name: "description",
+        content:
+          "Upload your notes, get an instant AI-built quiz with timers, difficulty levels and per-question feedback. Studying, but make it a game.",
+      },
+      { property: "og:title", content: "QuizLab — Turn any PDF into a quiz game" },
+      {
+        property: "og:description",
+        content:
+          "Upload a PDF, pick your settings, and battle an AI-generated quiz with live scoring and instant feedback.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
+type Stage = "upload" | "playing" | "results";
+type Difficulty = "chill" | "mid" | "brutal";
+
+const DIFFICULTIES: { id: Difficulty; label: string; sub: string }[] = [
+  { id: "chill", label: "Chill", sub: "easy recall" },
+  { id: "mid", label: "Mid", sub: "real studying" },
+  { id: "brutal", label: "Brutal", sub: "exam boss mode" },
+];
+
 function Index() {
+  const [stage, setStage] = useState<Stage>("upload");
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [pdfText, setPdfText] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const [count, setCount] = useState(8);
+  const [minutes, setMinutes] = useState(5);
+  const [difficulty, setDifficulty] = useState<Difficulty>("mid");
+
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [answers, setAnswers] = useState<(number | null)[]>([]);
+  const [current, setCurrent] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(0);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const makeQuiz = useServerFn(generateQuiz);
+
+  const handleFile = useCallback(async (file: File) => {
+    setError(null);
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      setError("PDFs only, bestie.");
+      return;
+    }
+    setBusy("Reading your PDF…");
+    try {
+      const text = await extractPdfText(file);
+      if (text.length < 200) {
+        setError("That PDF looks like scanned images — no text to read.");
+        setBusy(null);
+        return;
+      }
+      setPdfText(text);
+      setFileName(file.name);
+    } catch {
+      setError("Couldn't read that file. Try another PDF.");
+    }
+    setBusy(null);
+  }, []);
+
+  const start = async () => {
+    setError(null);
+    setBusy("Cooking your quiz…");
+    try {
+      const result = await makeQuiz({
+        data: { text: pdfText, count, difficulty },
+      });
+      if (!result.questions.length) throw new Error("No questions came back.");
+      setQuiz(result);
+      setAnswers(Array(result.questions.length).fill(null));
+      setCurrent(0);
+      setRevealed(false);
+      setStreak(0);
+      setBestStreak(0);
+      setSecondsLeft(minutes * 60);
+      setStage("playing");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something broke. Try again.");
+    }
+    setBusy(null);
+  };
+
+  useEffect(() => {
+    if (stage !== "playing") return;
+    const id = setInterval(() => {
+      setSecondsLeft((s) => {
+        if (s <= 1) {
+          clearInterval(id);
+          setStage("results");
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [stage]);
+
+  const questions = quiz?.questions ?? [];
+  const score = useMemo(
+    () => answers.filter((a, i) => a !== null && a === questions[i]?.correctIndex).length,
+    [answers, questions],
+  );
+
+  const pick = (index: number) => {
+    if (revealed) return;
+    const next = [...answers];
+    next[current] = index;
+    setAnswers(next);
+    setRevealed(true);
+    const correct = index === questions[current]?.correctIndex;
+    setStreak((s) => {
+      const value = correct ? s + 1 : 0;
+      setBestStreak((b) => Math.max(b, value));
+      return value;
+    });
+  };
+
+  const next = () => {
+    if (current + 1 >= questions.length) {
+      setStage("results");
+      return;
+    }
+    setCurrent((c) => c + 1);
+    setRevealed(false);
+  };
+
+  const reset = () => {
+    setStage("upload");
+    setQuiz(null);
+    setPdfText("");
+    setFileName(null);
+  };
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10">
+      <header className="mb-10 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="grid size-10 place-items-center rounded-2xl bg-primary text-primary-foreground">
+            <Zap className="size-5" />
+          </span>
+          <span className="font-display text-xl font-bold">QuizLab</span>
+        </div>
+        <Badge variant="outline" className="rounded-full border-accent/40 text-accent">
+          study, but a game
+        </Badge>
+      </header>
+
+      {stage === "upload" && (
+        <section className="space-y-8">
+          <div className="space-y-3 text-center">
+            <h1 className="font-display text-5xl font-bold leading-[1.05] sm:text-6xl">
+              drop a PDF.
+              <br />
+              <span className="text-hype">get quizzed.</span>
+            </h1>
+            <p className="mx-auto max-w-md text-muted-foreground">
+              Your notes go in, an AI-built quiz comes out — with timers, streaks and
+              feedback that actually explains stuff.
+            </p>
+          </div>
+
+          <div
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              const file = e.dataTransfer.files?.[0];
+              if (file) void handleFile(file);
+            }}
+            onClick={() => inputRef.current?.click()}
+            className="surface-card glow-lime cursor-pointer p-10 text-center transition-transform hover:-translate-y-0.5"
+          >
+            <input
+              ref={inputRef}
+              type="file"
+              accept="application/pdf"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void handleFile(file);
+              }}
+            />
+            <FileUp className="mx-auto mb-3 size-8 text-primary" />
+            <p className="font-display text-lg font-bold">
+              {fileName ?? "Drop your PDF here"}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {fileName ? "locked in — tweak the settings below" : "or tap to browse (max 40 pages read)"}
+            </p>
+          </div>
+
+          <div className="surface-card space-y-7 p-6">
+            <h2 className="font-display text-lg font-bold">Quiz settings</h2>
+
+            <SettingRow icon={<Target className="size-4" />} label="Questions" value={`${count}`}>
+              <Slider
+                value={[count]}
+                min={3}
+                max={20}
+                step={1}
+                onValueChange={(v) => setCount(v[0] ?? 8)}
+              />
+            </SettingRow>
+
+            <SettingRow
+              icon={<Clock className="size-4" />}
+              label="Time limit"
+              value={`${minutes} min`}
+            >
+              <Slider
+                value={[minutes]}
+                min={1}
+                max={30}
+                step={1}
+                onValueChange={(v) => setMinutes(v[0] ?? 5)}
+              />
+            </SettingRow>
+
+            <div className="space-y-3">
+              <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Flame className="size-4" /> Difficulty
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {DIFFICULTIES.map((d) => (
+                  <button
+                    key={d.id}
+                    onClick={() => setDifficulty(d.id)}
+                    className={cn(
+                      "rounded-2xl border px-3 py-3 text-left transition-colors",
+                      difficulty === d.id
+                        ? "border-primary/60 bg-primary/15"
+                        : "border-border bg-secondary/40 hover:bg-secondary",
+                    )}
+                  >
+                    <span className="block font-display font-bold">{d.label}</span>
+                    <span className="text-xs text-muted-foreground">{d.sub}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {error && <p className="text-center text-sm text-destructive">{error}</p>}
+
+          <Button
+            size="lg"
+            className="h-14 w-full rounded-2xl text-base font-bold"
+            disabled={!pdfText || !!busy}
+            onClick={start}
+          >
+            {busy ? (
+              <>
+                <Loader2 className="mr-2 size-5 animate-spin" /> {busy}
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 size-5" /> Generate my quiz
+              </>
+            )}
+          </Button>
+        </section>
+      )}
+
+      {stage === "playing" && questions[current] && (
+        <QuizPlay
+          quiz={quiz!}
+          index={current}
+          answer={answers[current] ?? null}
+          revealed={revealed}
+          streak={streak}
+          score={score}
+          secondsLeft={secondsLeft}
+          onPick={pick}
+          onNext={next}
+        />
+      )}
+
+      {stage === "results" && quiz && (
+        <Results
+          quiz={quiz}
+          answers={answers}
+          score={score}
+          bestStreak={bestStreak}
+          onReset={reset}
+        />
+      )}
+    </main>
+  );
+}
+
+function SettingRow({
+  icon,
+  label,
+  value,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between text-sm">
+        <span className="flex items-center gap-2 font-medium text-muted-foreground">
+          {icon} {label}
+        </span>
+        <span className="font-display font-bold text-primary">{value}</span>
+      </div>
+      {children}
     </div>
+  );
+}
+
+function formatTime(total: number) {
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function QuizPlay({
+  quiz,
+  index,
+  answer,
+  revealed,
+  streak,
+  score,
+  secondsLeft,
+  onPick,
+  onNext,
+}: {
+  quiz: Quiz;
+  index: number;
+  answer: number | null;
+  revealed: boolean;
+  streak: number;
+  score: number;
+  secondsLeft: number;
+  onPick: (i: number) => void;
+  onNext: () => void;
+}) {
+  const q = quiz.questions[index]!;
+  const correct = answer === q.correctIndex;
+  const low = secondsLeft <= 30;
+
+  return (
+    <section className="space-y-6">
+      <div className="flex items-center justify-between">
+        <Badge variant="outline" className="rounded-full">
+          Q{index + 1} / {quiz.questions.length}
+        </Badge>
+        <div className="flex items-center gap-3 text-sm">
+          <span className="flex items-center gap-1 text-accent">
+            <Flame className="size-4" /> {streak}
+          </span>
+          <span className="flex items-center gap-1 text-primary">
+            <Trophy className="size-4" /> {score}
+          </span>
+          <span
+            className={cn(
+              "flex items-center gap-1 font-display font-bold",
+              low ? "text-destructive" : "text-muted-foreground",
+            )}
+          >
+            <Clock className="size-4" /> {formatTime(secondsLeft)}
+          </span>
+        </div>
+      </div>
+
+      <Progress value={((index + (revealed ? 1 : 0)) / quiz.questions.length) * 100} />
+
+      <div className="surface-card space-y-5 p-6">
+        <div className="flex flex-wrap gap-2">
+          <Badge className="rounded-full bg-secondary text-secondary-foreground">
+            {q.topic}
+          </Badge>
+          <Badge variant="outline" className="rounded-full capitalize">
+            {q.difficulty}
+          </Badge>
+        </div>
+        <h2 className="font-display text-2xl font-bold leading-snug">{q.question}</h2>
+
+        <div className="space-y-2">
+          {q.options.map((option, i) => {
+            const isCorrect = i === q.correctIndex;
+            const isPicked = i === answer;
+            return (
+              <button
+                key={i}
+                disabled={revealed}
+                onClick={() => onPick(i)}
+                className={cn(
+                  "w-full rounded-2xl border px-4 py-3 text-left transition-colors",
+                  !revealed && "border-border bg-secondary/40 hover:bg-secondary",
+                  revealed && isCorrect && "border-success/60 bg-success/15 text-success",
+                  revealed &&
+                    isPicked &&
+                    !isCorrect &&
+                    "border-destructive/60 bg-destructive/15 text-destructive",
+                  revealed && !isCorrect && !isPicked && "border-border opacity-50",
+                )}
+              >
+                <span className="mr-2 font-display font-bold">
+                  {String.fromCharCode(65 + i)}.
+                </span>
+                {option}
+              </button>
+            );
+          })}
+        </div>
+
+        {revealed && (
+          <div
+            className={cn(
+              "rounded-2xl border p-4",
+              correct ? "border-success/40 bg-success/10" : "border-destructive/40 bg-destructive/10",
+            )}
+          >
+            <p className="font-display font-bold">
+              {correct ? "W answer 🔥" : "Nope — here's the tea"}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{q.explanation}</p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Topic: <span className="text-foreground">{q.topic}</span> · Level:{" "}
+              <span className="capitalize text-foreground">{q.difficulty}</span>
+            </p>
+          </div>
+        )}
+      </div>
+
+      <Button
+        size="lg"
+        className="h-14 w-full rounded-2xl text-base font-bold"
+        disabled={!revealed}
+        onClick={onNext}
+      >
+        {index + 1 >= quiz.questions.length ? "See my score" : "Next question"}
+      </Button>
+    </section>
+  );
+}
+
+function Results({
+  quiz,
+  answers,
+  score,
+  bestStreak,
+  onReset,
+}: {
+  quiz: Quiz;
+  answers: (number | null)[];
+  score: number;
+  bestStreak: number;
+  onReset: () => void;
+}) {
+  const total = quiz.questions.length;
+  const pct = Math.round((score / total) * 100);
+  const verdict =
+    pct >= 85 ? "certified genius" : pct >= 60 ? "solid, keep cooking" : "we need a rerun";
+
+  return (
+    <section className="space-y-6">
+      <div className="surface-card glow-pink p-8 text-center">
+        <Brain className="mx-auto mb-3 size-8 text-accent" />
+        <p className="font-display text-6xl font-bold text-hype">{pct}%</p>
+        <p className="mt-2 font-display text-xl font-bold">{verdict}</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {score}/{total} correct · best streak {bestStreak} 🔥
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        {quiz.questions.map((q, i) => {
+          const picked = answers[i] ?? null;
+          const ok = picked === q.correctIndex;
+          return (
+            <div key={i} className="surface-card space-y-2 p-5">
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-display font-bold">
+                  {i + 1}. {q.question}
+                </p>
+                <Badge
+                  className={cn(
+                    "shrink-0 rounded-full",
+                    ok
+                      ? "bg-success text-success-foreground"
+                      : "bg-destructive text-destructive-foreground",
+                  )}
+                >
+                  {ok ? "correct" : picked === null ? "skipped" : "wrong"}
+                </Badge>
+              </div>
+              <p className="text-sm">
+                <span className="text-muted-foreground">Answer: </span>
+                {q.options[q.correctIndex]}
+              </p>
+              {picked !== null && !ok && (
+                <p className="text-sm text-destructive">You picked: {q.options[picked]}</p>
+              )}
+              <p className="text-sm text-muted-foreground">{q.explanation}</p>
+              <p className="text-xs text-muted-foreground">
+                {q.topic} · <span className="capitalize">{q.difficulty}</span>
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      <Button
+        size="lg"
+        variant="secondary"
+        className="h-14 w-full rounded-2xl text-base font-bold"
+        onClick={onReset}
+      >
+        <RotateCcw className="mr-2 size-5" /> New PDF
+      </Button>
+    </section>
   );
 }
