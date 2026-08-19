@@ -447,21 +447,24 @@ function QuizPlay({
         </div>
 
         {revealed && (
-          <div
-            className={cn(
-              "rounded-2xl border p-4",
-              correct ? "border-success/40 bg-success/10" : "border-destructive/40 bg-destructive/10",
-            )}
-          >
-            <p className="font-display font-bold">
-              {correct ? "W answer 🔥" : "Nope — here's the tea"}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">{q.explanation}</p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Topic: <span className="text-foreground">{q.topic}</span> · Level:{" "}
-              <span className="capitalize text-foreground">{q.difficulty}</span>
-            </p>
-          </div>
+          <>
+            <div
+              className={cn(
+                "rounded-2xl border p-4",
+                correct ? "border-success/40 bg-success/10" : "border-destructive/40 bg-destructive/10",
+              )}
+            >
+              <p className="font-display font-bold">
+                {correct ? "W answer 🔥" : "Nope — here's the tea"}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{q.explanation}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Topic: <span className="text-foreground">{q.topic}</span> · Level:{" "}
+                <span className="capitalize text-foreground">{q.difficulty}</span>
+              </p>
+            </div>
+            <FactCheckPanel question={q} />
+          </>
         )}
       </div>
 
