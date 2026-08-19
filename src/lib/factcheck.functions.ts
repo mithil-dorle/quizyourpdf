@@ -10,6 +10,8 @@ const Input = z.object({
 
 const CheckSchema = z.object({
   verdict: z.enum(["solid", "ambiguous", "wrong"]).default("solid"),
+  confidence: z.coerce.number().min(0).max(100).catch(50).default(50),
+  confidenceReason: z.string().default(""),
   note: z.string().default(""),
   suggestedQuestion: z.string().default(""),
   suggestedAnswer: z.string().default(""),
@@ -46,8 +48,10 @@ Decide:
 - "ambiguous" = wording is unclear, multiple options could be right, or it depends on context.
 - "wrong" = the marked answer is factually incorrect.
 
+Also rate how certain you are, 0-100, based on how well-established and verifiable the facts and sources are.
+
 Reply with ONLY raw JSON (no fences):
-{"verdict":"solid|ambiguous|wrong","note":"1-2 sentences, Gen-Z friendly, explain the issue or confirm it checks out","suggestedQuestion":"clearer rewrite, or empty string if solid","suggestedAnswer":"the correct answer, or empty string if solid","sources":[{"title":"source name","url":"https://..."}]}
+{"verdict":"solid|ambiguous|wrong","confidence":0-100,"confidenceReason":"1 short sentence on why you're this certain (source quality, how settled the fact is)","note":"1-2 sentences, Gen-Z friendly, explain the issue or confirm it checks out","suggestedQuestion":"clearer rewrite, or empty string if solid","suggestedAnswer":"the correct answer, or empty string if solid","sources":[{"title":"source name","url":"https://..."}]}
 
 Source rules: only cite real, well-known, stable pages (Wikipedia, official docs, .edu/.gov). Never invent a URL — if you are not sure a URL exists, return an empty sources array. Always include at least one source when the verdict is not "solid" and you are confident it exists.`;
 
