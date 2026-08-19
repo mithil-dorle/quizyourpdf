@@ -535,6 +535,29 @@ function FactCheckPanel({ question }: { question: QuizQuestion }) {
             : "Fact-check: kinda ambiguous"}
       </p>
       {state.note && <p className="mt-1 text-sm text-muted-foreground">{state.note}</p>}
+
+      <div className="mt-3 space-y-1.5">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">Confidence</span>
+          <span
+            className={cn(
+              "font-display font-bold",
+              state.confidence >= 80
+                ? "text-success"
+                : state.confidence >= 50
+                  ? "text-accent"
+                  : "text-destructive",
+            )}
+          >
+            {Math.round(state.confidence)}%
+          </span>
+        </div>
+        <Progress value={state.confidence} className="h-1.5" />
+        {state.confidenceReason && (
+          <p className="text-xs text-muted-foreground">{state.confidenceReason}</p>
+        )}
+      </div>
+
       {!clean && state.suggestedQuestion && (
         <p className="mt-2 text-sm">
           <span className="text-muted-foreground">Better question: </span>
