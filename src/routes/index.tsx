@@ -6,8 +6,10 @@ import {
   Clock,
   FileUp,
   Flame,
+  Link as LinkIcon,
   Loader2,
   RotateCcw,
+  ShieldCheck,
   Sparkles,
   Target,
   Trophy,
@@ -19,7 +21,8 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { extractPdfText } from "@/lib/pdf";
-import { generateQuiz, type Quiz } from "@/lib/quiz.functions";
+import { generateQuiz, type Quiz, type QuizQuestion } from "@/lib/quiz.functions";
+import { factCheckQuestion, type FactCheck } from "@/lib/factcheck.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -447,21 +450,24 @@ function QuizPlay({
         </div>
 
         {revealed && (
-          <div
-            className={cn(
-              "rounded-2xl border p-4",
-              correct ? "border-success/40 bg-success/10" : "border-destructive/40 bg-destructive/10",
-            )}
-          >
-            <p className="font-display font-bold">
-              {correct ? "W answer 🔥" : "Nope — here's the tea"}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">{q.explanation}</p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Topic: <span className="text-foreground">{q.topic}</span> · Level:{" "}
-              <span className="capitalize text-foreground">{q.difficulty}</span>
-            </p>
-          </div>
+          <>
+            <div
+              className={cn(
+                "rounded-2xl border p-4",
+                correct ? "border-success/40 bg-success/10" : "border-destructive/40 bg-destructive/10",
+              )}
+            >
+              <p className="font-display font-bold">
+                {correct ? "W answer 🔥" : "Nope — here's the tea"}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{q.explanation}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Topic: <span className="text-foreground">{q.topic}</span> · Level:{" "}
+                <span className="capitalize text-foreground">{q.difficulty}</span>
+              </p>
+            </div>
+            <FactCheckPanel question={q} />
+          </>
         )}
       </div>
 
@@ -474,6 +480,89 @@ function QuizPlay({
         {index + 1 >= quiz.questions.length ? "See my score" : "Next question"}
       </Button>
     </section>
+  );
+}
+
+function FactCheckPanel({ question }: { question: QuizQuestion }) {
+  const check = useServerFn(factCheckQuestion);
+  const [state, setState] = useState<FactCheck | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    setState(null);
+    setLoading(true);
+    setFailed(false);
+    check({
+      data: {
+        question: question.question,
+        options: question.options,
+        correctIndex: question.correctIndex,
+      },
+    })
+      .then((r) => alive && setState(r))
+      .catch(() => alive && setFailed(true))
+      .finally(() => alive && setLoading(false));
+    return () => {
+      alive = false;
+    };
+  }, [question, check]);
+
+  if (loading)
+    return (
+      <p className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Loader2 className="size-3 animate-spin" /> fact-checking this one…
+      </p>
+    );
+  if (failed || !state) return null;
+
+  const clean = state.verdict === "solid";
+
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border p-4",
+        clean ? "border-border bg-secondary/30" : "border-accent/50 bg-accent/10",
+      )}
+    >
+      <p className="flex items-center gap-2 font-display text-sm font-bold">
+        <ShieldCheck className={cn("size-4", clean ? "text-success" : "text-accent")} />
+        {clean
+          ? "Fact-check: checks out"
+          : state.verdict === "wrong"
+            ? "Fact-check: this answer looks off"
+            : "Fact-check: kinda ambiguous"}
+      </p>
+      {state.note && <p className="mt-1 text-sm text-muted-foreground">{state.note}</p>}
+      {!clean && state.suggestedQuestion && (
+        <p className="mt-2 text-sm">
+          <span className="text-muted-foreground">Better question: </span>
+          {state.suggestedQuestion}
+        </p>
+      )}
+      {!clean && state.suggestedAnswer && (
+        <p className="mt-1 text-sm">
+          <span className="text-muted-foreground">Correct answer: </span>
+          <span className="text-success">{state.suggestedAnswer}</span>
+        </p>
+      )}
+      {state.sources.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {state.sources.map((s, i) => (
+            <a
+              key={i}
+              href={s.url}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
+            >
+              <LinkIcon className="size-3" /> {s.title}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
