@@ -666,12 +666,14 @@ function Results({
   answers,
   score,
   bestStreak,
+  factChecks,
   onReset,
 }: {
   quiz: Quiz;
   answers: (number | null)[];
   score: number;
   bestStreak: number;
+  factChecks: Record<number, FactCheck>;
   onReset: () => void;
 }) {
   const total = quiz.questions.length;
@@ -722,6 +724,31 @@ function Results({
               <p className="text-xs text-muted-foreground">
                 {q.topic} · <span className="capitalize">{q.difficulty}</span>
               </p>
+              {factChecks[i] && (
+                <div
+                  className={cn(
+                    "mt-2 rounded-xl border p-4",
+                    factChecks[i]!.verdict === "solid"
+                      ? "border-border bg-secondary/30"
+                      : "border-accent/50 bg-accent/10",
+                  )}
+                >
+                  <p className="flex items-center gap-2 font-display text-sm font-bold">
+                    <ShieldCheck
+                      className={cn(
+                        "size-4",
+                        factChecks[i]!.verdict === "solid" ? "text-success" : "text-accent",
+                      )}
+                    />
+                    {factChecks[i]!.verdict === "solid"
+                      ? "Fact-check: checks out"
+                      : factChecks[i]!.verdict === "wrong"
+                        ? "Fact-check: this answer looks off"
+                        : "Fact-check: kinda ambiguous"}
+                  </p>
+                  <FactCheckContent state={factChecks[i]!} />
+                </div>
+              )}
             </div>
           );
         })}
