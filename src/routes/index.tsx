@@ -496,13 +496,26 @@ function QuizPlay({
   );
 }
 
-function FactCheckPanel({ question }: { question: QuizQuestion }) {
+function FactCheckPanel({
+  question,
+  cached,
+  onSave,
+}: {
+  question: QuizQuestion;
+  cached: FactCheck | null;
+  onSave: (check: FactCheck) => void;
+}) {
   const check = useServerFn(factCheckQuestion);
-  const [state, setState] = useState<FactCheck | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<FactCheck | null>(cached);
+  const [loading, setLoading] = useState(!cached);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    if (cached) {
+      setState(cached);
+      setLoading(false);
+      return;
+    }
     let alive = true;
     setState(null);
     setLoading(true);
@@ -514,12 +527,17 @@ function FactCheckPanel({ question }: { question: QuizQuestion }) {
         correctIndex: question.correctIndex,
       },
     })
-      .then((r) => alive && setState(r))
+      .then((r) => {
+        if (!alive) return;
+        setState(r);
+        onSave(r);
+      })
       .catch(() => alive && setFailed(true))
       .finally(() => alive && setLoading(false));
     return () => {
       alive = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question, check]);
 
   if (loading)
@@ -547,6 +565,15 @@ function FactCheckPanel({ question }: { question: QuizQuestion }) {
             ? "Fact-check: this answer looks off"
             : "Fact-check: kinda ambiguous"}
       </p>
+      <FactCheckContent state={state} />
+    </div>
+  );
+}
+
+function FactCheckContent({ state }: { state: FactCheck }) {
+  const clean = state.verdict === "solid";
+  return (
+    <>
       {state.note && <p className="mt-1 text-sm text-muted-foreground">{state.note}</p>}
 
       <div className="mt-3 space-y-1.5">
@@ -570,6 +597,38 @@ function FactCheckPanel({ question }: { question: QuizQuestion }) {
           <p className="text-xs text-muted-foreground">{state.confidenceReason}</p>
         )}
       </div>
+
+      {state.evidence.length > 0 && (
+        <div className="mt-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            Why the answer holds up
+          </p>
+          <ul className="mt-1 space-y-1">
+            {state.evidence.map((e, i) => (
+              <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                <span className="shrink-0 text-success">✓</span>
+                <span>{e}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {state.rejections.length > 0 && (
+        <div className="mt-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            Why the other options flopped
+          </p>
+          <ul className="mt-1 space-y-1">
+            {state.rejections.map((r, i) => (
+              <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                <span className="shrink-0 text-destructive">✕</span>
+                <span>{r}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {!clean && state.suggestedQuestion && (
         <p className="mt-2 text-sm">
@@ -598,7 +657,7 @@ function FactCheckPanel({ question }: { question: QuizQuestion }) {
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
