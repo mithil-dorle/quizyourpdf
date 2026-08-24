@@ -73,6 +73,7 @@ function Index() {
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(0);
+  const [factChecks, setFactChecks] = useState<Record<number, FactCheck>>({});
 
   const inputRef = useRef<HTMLInputElement>(null);
   const makeQuiz = useServerFn(generateQuiz);
@@ -114,6 +115,7 @@ function Index() {
       setStreak(0);
       setBestStreak(0);
       setSecondsLeft(minutes * 60);
+      setFactChecks({});
       setStage("playing");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something broke. Try again.");
@@ -310,6 +312,8 @@ function Index() {
           streak={streak}
           score={score}
           secondsLeft={secondsLeft}
+          factCheck={factChecks[current] ?? null}
+          onFactCheck={(i, c) => setFactChecks((prev) => ({ ...prev, [i]: c }))}
           onPick={pick}
           onNext={next}
         />
@@ -321,6 +325,7 @@ function Index() {
           answers={answers}
           score={score}
           bestStreak={bestStreak}
+          factChecks={factChecks}
           onReset={reset}
         />
       )}
