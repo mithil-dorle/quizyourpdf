@@ -73,6 +73,7 @@ function Index() {
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(0);
+  const [factChecks, setFactChecks] = useState<Record<number, FactCheck>>({});
 
   const inputRef = useRef<HTMLInputElement>(null);
   const makeQuiz = useServerFn(generateQuiz);
@@ -114,6 +115,7 @@ function Index() {
       setStreak(0);
       setBestStreak(0);
       setSecondsLeft(minutes * 60);
+      setFactChecks({});
       setStage("playing");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something broke. Try again.");
@@ -310,6 +312,8 @@ function Index() {
           streak={streak}
           score={score}
           secondsLeft={secondsLeft}
+          factCheck={factChecks[current] ?? null}
+          onFactCheck={(i, c) => setFactChecks((prev) => ({ ...prev, [i]: c }))}
           onPick={pick}
           onNext={next}
         />
@@ -321,6 +325,7 @@ function Index() {
           answers={answers}
           score={score}
           bestStreak={bestStreak}
+          factChecks={factChecks}
           onReset={reset}
         />
       )}
@@ -366,6 +371,8 @@ function QuizPlay({
   streak,
   score,
   secondsLeft,
+  factCheck,
+  onFactCheck,
   onPick,
   onNext,
 }: {
@@ -376,6 +383,8 @@ function QuizPlay({
   streak: number;
   score: number;
   secondsLeft: number;
+  factCheck: FactCheck | null;
+  onFactCheck: (index: number, check: FactCheck) => void;
   onPick: (i: number) => void;
   onNext: () => void;
 }) {
@@ -466,7 +475,11 @@ function QuizPlay({
                 <span className="capitalize text-foreground">{q.difficulty}</span>
               </p>
             </div>
-            <FactCheckPanel question={q} />
+            <FactCheckPanel
+              question={q}
+              cached={factCheck}
+              onSave={(c) => onFactCheck(index, c)}
+            />
           </>
         )}
       </div>
@@ -483,13 +496,26 @@ function QuizPlay({
   );
 }
 
-function FactCheckPanel({ question }: { question: QuizQuestion }) {
+function FactCheckPanel({
+  question,
+  cached,
+  onSave,
+}: {
+  question: QuizQuestion;
+  cached: FactCheck | null;
+  onSave: (check: FactCheck) => void;
+}) {
   const check = useServerFn(factCheckQuestion);
-  const [state, setState] = useState<FactCheck | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<FactCheck | null>(cached);
+  const [loading, setLoading] = useState(!cached);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    if (cached) {
+      setState(cached);
+      setLoading(false);
+      return;
+    }
     let alive = true;
     setState(null);
     setLoading(true);
@@ -501,12 +527,17 @@ function FactCheckPanel({ question }: { question: QuizQuestion }) {
         correctIndex: question.correctIndex,
       },
     })
-      .then((r) => alive && setState(r))
+      .then((r) => {
+        if (!alive) return;
+        setState(r);
+        onSave(r);
+      })
       .catch(() => alive && setFailed(true))
       .finally(() => alive && setLoading(false));
     return () => {
       alive = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question, check]);
 
   if (loading)
@@ -534,6 +565,15 @@ function FactCheckPanel({ question }: { question: QuizQuestion }) {
             ? "Fact-check: this answer looks off"
             : "Fact-check: kinda ambiguous"}
       </p>
+      <FactCheckContent state={state} />
+    </div>
+  );
+}
+
+function FactCheckContent({ state }: { state: FactCheck }) {
+  const clean = state.verdict === "solid";
+  return (
+    <>
       {state.note && <p className="mt-1 text-sm text-muted-foreground">{state.note}</p>}
 
       <div className="mt-3 space-y-1.5">
@@ -557,6 +597,38 @@ function FactCheckPanel({ question }: { question: QuizQuestion }) {
           <p className="text-xs text-muted-foreground">{state.confidenceReason}</p>
         )}
       </div>
+
+      {state.evidence.length > 0 && (
+        <div className="mt-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            Why the answer holds up
+          </p>
+          <ul className="mt-1 space-y-1">
+            {state.evidence.map((e, i) => (
+              <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                <span className="shrink-0 text-success">✓</span>
+                <span>{e}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {state.rejections.length > 0 && (
+        <div className="mt-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            Why the other options flopped
+          </p>
+          <ul className="mt-1 space-y-1">
+            {state.rejections.map((r, i) => (
+              <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                <span className="shrink-0 text-destructive">✕</span>
+                <span>{r}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {!clean && state.suggestedQuestion && (
         <p className="mt-2 text-sm">
@@ -585,7 +657,7 @@ function FactCheckPanel({ question }: { question: QuizQuestion }) {
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
@@ -594,12 +666,14 @@ function Results({
   answers,
   score,
   bestStreak,
+  factChecks,
   onReset,
 }: {
   quiz: Quiz;
   answers: (number | null)[];
   score: number;
   bestStreak: number;
+  factChecks: Record<number, FactCheck>;
   onReset: () => void;
 }) {
   const total = quiz.questions.length;
@@ -650,6 +724,31 @@ function Results({
               <p className="text-xs text-muted-foreground">
                 {q.topic} · <span className="capitalize">{q.difficulty}</span>
               </p>
+              {factChecks[i] && (
+                <div
+                  className={cn(
+                    "mt-2 rounded-xl border p-4",
+                    factChecks[i]!.verdict === "solid"
+                      ? "border-border bg-secondary/30"
+                      : "border-accent/50 bg-accent/10",
+                  )}
+                >
+                  <p className="flex items-center gap-2 font-display text-sm font-bold">
+                    <ShieldCheck
+                      className={cn(
+                        "size-4",
+                        factChecks[i]!.verdict === "solid" ? "text-success" : "text-accent",
+                      )}
+                    />
+                    {factChecks[i]!.verdict === "solid"
+                      ? "Fact-check: checks out"
+                      : factChecks[i]!.verdict === "wrong"
+                        ? "Fact-check: this answer looks off"
+                        : "Fact-check: kinda ambiguous"}
+                  </p>
+                  <FactCheckContent state={factChecks[i]!} />
+                </div>
+              )}
             </div>
           );
         })}
