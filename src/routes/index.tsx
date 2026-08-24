@@ -371,6 +371,8 @@ function QuizPlay({
   streak,
   score,
   secondsLeft,
+  factCheck,
+  onFactCheck,
   onPick,
   onNext,
 }: {
@@ -381,6 +383,8 @@ function QuizPlay({
   streak: number;
   score: number;
   secondsLeft: number;
+  factCheck: FactCheck | null;
+  onFactCheck: (index: number, check: FactCheck) => void;
   onPick: (i: number) => void;
   onNext: () => void;
 }) {
@@ -471,7 +475,11 @@ function QuizPlay({
                 <span className="capitalize text-foreground">{q.difficulty}</span>
               </p>
             </div>
-            <FactCheckPanel question={q} />
+            <FactCheckPanel
+              question={q}
+              cached={factCheck}
+              onSave={(c) => onFactCheck(index, c)}
+            />
           </>
         )}
       </div>
