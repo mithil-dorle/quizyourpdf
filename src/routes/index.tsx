@@ -8,6 +8,7 @@ import {
   Flame,
   Link as LinkIcon,
   Loader2,
+  Pause,
   RotateCcw,
   ShieldCheck,
   Sparkles,
