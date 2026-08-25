@@ -49,12 +49,19 @@ export const Route = createFileRoute("/")({
 
 type Stage = "upload" | "playing" | "results";
 type Difficulty = "chill" | "mid" | "brutal";
+type Mode = "practice" | "exam";
 
 const DIFFICULTIES: { id: Difficulty; label: string; sub: string }[] = [
   { id: "chill", label: "Chill", sub: "easy recall" },
   { id: "mid", label: "Mid", sub: "real studying" },
   { id: "brutal", label: "Brutal", sub: "exam boss mode" },
 ];
+
+const MODES: { id: Mode; label: string; sub: string }[] = [
+  { id: "practice", label: "Practice", sub: "answers + fact-check instantly" },
+  { id: "exam", label: "Exam", sub: "everything revealed at the end" },
+];
+
 
 function Index() {
   const [stage, setStage] = useState<Stage>("upload");
