@@ -73,6 +73,8 @@ function Index() {
   const [count, setCount] = useState(8);
   const [minutes, setMinutes] = useState(5);
   const [difficulty, setDifficulty] = useState<Difficulty>("mid");
+  const [mode, setMode] = useState<Mode>("practice");
+
 
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
