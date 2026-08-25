@@ -8,6 +8,7 @@ import {
   Flame,
   Link as LinkIcon,
   Loader2,
+  Pause,
   RotateCcw,
   ShieldCheck,
   Sparkles,
@@ -124,7 +125,7 @@ function Index() {
   };
 
   useEffect(() => {
-    if (stage !== "playing") return;
+    if (stage !== "playing" || revealed) return;
     const id = setInterval(() => {
       setSecondsLeft((s) => {
         if (s <= 1) {
@@ -136,7 +137,7 @@ function Index() {
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [stage]);
+  }, [stage, revealed]);
 
   const questions = quiz?.questions ?? [];
   const score = useMemo(
@@ -408,10 +409,11 @@ function QuizPlay({
           <span
             className={cn(
               "flex items-center gap-1 font-display font-bold",
-              low ? "text-destructive" : "text-muted-foreground",
+              revealed ? "text-accent" : low ? "text-destructive" : "text-muted-foreground",
             )}
           >
-            <Clock className="size-4" /> {formatTime(secondsLeft)}
+            {revealed ? <Pause className="size-4" /> : <Clock className="size-4" />}{" "}
+            {formatTime(secondsLeft)}
           </span>
         </div>
       </div>
