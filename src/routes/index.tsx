@@ -124,7 +124,7 @@ function Index() {
   };
 
   useEffect(() => {
-    if (stage !== "playing") return;
+    if (stage !== "playing" || revealed) return;
     const id = setInterval(() => {
       setSecondsLeft((s) => {
         if (s <= 1) {
@@ -136,7 +136,7 @@ function Index() {
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [stage]);
+  }, [stage, revealed]);
 
   const questions = quiz?.questions ?? [];
   const score = useMemo(
