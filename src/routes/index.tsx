@@ -408,10 +408,11 @@ function QuizPlay({
           <span
             className={cn(
               "flex items-center gap-1 font-display font-bold",
-              low ? "text-destructive" : "text-muted-foreground",
+              revealed ? "text-accent" : low ? "text-destructive" : "text-muted-foreground",
             )}
           >
-            <Clock className="size-4" /> {formatTime(secondsLeft)}
+            {revealed ? <Pause className="size-4" /> : <Clock className="size-4" />}{" "}
+            {formatTime(secondsLeft)}
           </span>
         </div>
       </div>
