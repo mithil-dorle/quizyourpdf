@@ -134,7 +134,8 @@ function Index() {
   };
 
   useEffect(() => {
-    if (stage !== "playing" || revealed) return;
+    if (stage !== "playing") return;
+    if (revealed && mode === "practice") return;
     const id = setInterval(() => {
       setSecondsLeft((s) => {
         if (s <= 1) {
@@ -146,7 +147,7 @@ function Index() {
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [stage, revealed]);
+  }, [stage, revealed, mode]);
 
   const questions = quiz?.questions ?? [];
   const score = useMemo(
@@ -159,6 +160,7 @@ function Index() {
     const next = [...answers];
     next[current] = index;
     setAnswers(next);
+    if (mode === "exam") return;
     setRevealed(true);
     const correct = index === questions[current]?.correctIndex;
     setStreak((s) => {
@@ -166,6 +168,18 @@ function Index() {
       setBestStreak((b) => Math.max(b, value));
       return value;
     });
+  };
+
+  const goTo = (i: number) => {
+    setCurrent(Math.max(0, Math.min(questions.length - 1, i)));
+    setRevealed(false);
+  };
+
+  const skip = () => {
+    const nextAnswers = [...answers];
+    nextAnswers[current] = null;
+    setAnswers(nextAnswers);
+    next();
   };
 
   const next = () => {
@@ -176,6 +190,7 @@ function Index() {
     setCurrent((c) => c + 1);
     setRevealed(false);
   };
+
 
   const reset = () => {
     setStage("upload");
