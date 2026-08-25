@@ -305,6 +305,29 @@ function Index() {
                 ))}
               </div>
             </div>
+
+            <div className="space-y-3">
+              <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <ClipboardList className="size-4" /> Mode
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {MODES.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => setMode(m.id)}
+                    className={cn(
+                      "rounded-2xl border px-3 py-3 text-left transition-colors",
+                      mode === m.id
+                        ? "border-accent/60 bg-accent/15"
+                        : "border-border bg-secondary/40 hover:bg-secondary",
+                    )}
+                  >
+                    <span className="block font-display font-bold">{m.label}</span>
+                    <span className="text-xs text-muted-foreground">{m.sub}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {error && <p className="text-center text-sm text-destructive">{error}</p>}
@@ -331,7 +354,9 @@ function Index() {
       {stage === "playing" && questions[current] && (
         <QuizPlay
           quiz={quiz!}
+          mode={mode}
           index={current}
+          answers={answers}
           answer={answers[current] ?? null}
           revealed={revealed}
           streak={streak}
@@ -341,19 +366,25 @@ function Index() {
           onFactCheck={(i, c) => setFactChecks((prev) => ({ ...prev, [i]: c }))}
           onPick={pick}
           onNext={next}
+          onSkip={skip}
+          onJump={goTo}
+          onSubmit={() => setStage("results")}
         />
       )}
 
       {stage === "results" && quiz && (
         <Results
           quiz={quiz}
+          mode={mode}
           answers={answers}
           score={score}
           bestStreak={bestStreak}
           factChecks={factChecks}
+          onFactCheck={(i, c) => setFactChecks((prev) => ({ ...prev, [i]: c }))}
           onReset={reset}
         />
       )}
+
     </main>
   );
 }
