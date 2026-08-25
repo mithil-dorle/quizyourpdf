@@ -421,7 +421,9 @@ function formatTime(total: number) {
 
 function QuizPlay({
   quiz,
+  mode,
   index,
+  answers,
   answer,
   revealed,
   streak,
@@ -431,9 +433,14 @@ function QuizPlay({
   onFactCheck,
   onPick,
   onNext,
+  onSkip,
+  onJump,
+  onSubmit,
 }: {
   quiz: Quiz;
+  mode: Mode;
   index: number;
+  answers: (number | null)[];
   answer: number | null;
   revealed: boolean;
   streak: number;
@@ -443,37 +450,81 @@ function QuizPlay({
   onFactCheck: (index: number, check: FactCheck) => void;
   onPick: (i: number) => void;
   onNext: () => void;
+  onSkip: () => void;
+  onJump: (i: number) => void;
+  onSubmit: () => void;
 }) {
   const q = quiz.questions[index]!;
   const correct = answer === q.correctIndex;
   const low = secondsLeft <= 30;
+  const exam = mode === "exam";
+  const answeredCount = answers.filter((a) => a !== null).length;
+  const last = index + 1 >= quiz.questions.length;
 
   return (
     <section className="space-y-6">
       <div className="flex items-center justify-between">
-        <Badge variant="outline" className="rounded-full">
-          Q{index + 1} / {quiz.questions.length}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="rounded-full">
+            Q{index + 1} / {quiz.questions.length}
+          </Badge>
+          {exam && (
+            <Badge className="rounded-full bg-accent text-accent-foreground">exam mode</Badge>
+          )}
+        </div>
         <div className="flex items-center gap-3 text-sm">
-          <span className="flex items-center gap-1 text-accent">
-            <Flame className="size-4" /> {streak}
-          </span>
-          <span className="flex items-center gap-1 text-primary">
-            <Trophy className="size-4" /> {score}
-          </span>
+          {exam ? (
+            <span className="flex items-center gap-1 text-primary">
+              <ClipboardList className="size-4" /> {answeredCount}/{quiz.questions.length}
+            </span>
+          ) : (
+            <>
+              <span className="flex items-center gap-1 text-accent">
+                <Flame className="size-4" /> {streak}
+              </span>
+              <span className="flex items-center gap-1 text-primary">
+                <Trophy className="size-4" /> {score}
+              </span>
+            </>
+          )}
           <span
             className={cn(
               "flex items-center gap-1 font-display font-bold",
-              revealed ? "text-accent" : low ? "text-destructive" : "text-muted-foreground",
+              revealed && !exam
+                ? "text-accent"
+                : low
+                  ? "text-destructive"
+                  : "text-muted-foreground",
             )}
           >
-            {revealed ? <Pause className="size-4" /> : <Clock className="size-4" />}{" "}
+            {revealed && !exam ? <Pause className="size-4" /> : <Clock className="size-4" />}{" "}
             {formatTime(secondsLeft)}
           </span>
         </div>
       </div>
 
-      <Progress value={((index + (revealed ? 1 : 0)) / quiz.questions.length) * 100} />
+      <Progress value={((index + (revealed || exam ? 1 : 0)) / quiz.questions.length) * 100} />
+
+      {exam && (
+        <div className="flex flex-wrap gap-1.5">
+          {quiz.questions.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => onJump(i)}
+              className={cn(
+                "size-8 rounded-lg border font-display text-xs font-bold transition-colors",
+                i === index
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : answers[i] !== null
+                    ? "border-primary/40 bg-primary/15 text-primary"
+                    : "border-border bg-secondary/40 text-muted-foreground hover:bg-secondary",
+              )}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="surface-card space-y-5 p-6">
         <div className="flex flex-wrap gap-2">
@@ -497,7 +548,10 @@ function QuizPlay({
                 onClick={() => onPick(i)}
                 className={cn(
                   "w-full rounded-2xl border px-4 py-3 text-left transition-colors",
-                  !revealed && "border-border bg-secondary/40 hover:bg-secondary",
+                  !revealed &&
+                    (exam && isPicked
+                      ? "border-primary/60 bg-primary/15"
+                      : "border-border bg-secondary/40 hover:bg-secondary"),
                   revealed && isCorrect && "border-success/60 bg-success/15 text-success",
                   revealed &&
                     isPicked &&
@@ -539,19 +593,63 @@ function QuizPlay({
             />
           </>
         )}
+
+        {exam && (
+          <p className="text-xs text-muted-foreground">
+            No spoilers in exam mode — answers, fact-checks and analysis drop after you submit.
+          </p>
+        )}
       </div>
 
-      <Button
-        size="lg"
-        className="h-14 w-full rounded-2xl text-base font-bold"
-        disabled={!revealed}
-        onClick={onNext}
-      >
-        {index + 1 >= quiz.questions.length ? "See my score" : "Next question"}
-      </Button>
+      {exam ? (
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              className="h-14 flex-1 rounded-2xl font-bold"
+              disabled={index === 0}
+              onClick={() => onJump(index - 1)}
+            >
+              Back
+            </Button>
+            <Button
+              variant="secondary"
+              className="h-14 flex-1 rounded-2xl font-bold"
+              onClick={onSkip}
+            >
+              <SkipForward className="mr-2 size-5" /> Skip
+            </Button>
+            <Button
+              className="h-14 flex-1 rounded-2xl font-bold"
+              disabled={last}
+              onClick={onNext}
+            >
+              Next
+            </Button>
+          </div>
+          <Button
+            size="lg"
+            variant={answeredCount === quiz.questions.length || last ? "default" : "outline"}
+            className="h-14 w-full rounded-2xl text-base font-bold"
+            onClick={onSubmit}
+          >
+            Submit exam ({answeredCount}/{quiz.questions.length} answered)
+          </Button>
+        </div>
+      ) : (
+        <Button
+          size="lg"
+          className="h-14 w-full rounded-2xl text-base font-bold"
+          disabled={!revealed}
+          onClick={onNext}
+        >
+          {last ? "See my score" : "Next question"}
+        </Button>
+      )}
     </section>
   );
 }
+
 
 function FactCheckPanel({
   question,
