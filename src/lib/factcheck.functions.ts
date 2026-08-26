@@ -38,28 +38,26 @@ export const factCheckQuestion = createServerFn({ method: "POST" })
     const { createLovableAiGatewayProvider } = await import("./ai-gateway.server");
     const gateway = createLovableAiGatewayProvider(key);
 
-    const prompt = `You are a strict fact-checker for quiz questions. Cross-check the question below against widely accepted public knowledge (textbooks, encyclopedias, official docs).
+    const prompt = `Fact-check this quiz question against well-established public knowledge. Be fast and terse.
 
-QUESTION: ${data.question}
-OPTIONS:
+Q: ${data.question}
 ${data.options.map((o, i) => `${i}. ${o}`).join("\n")}
-MARKED CORRECT: ${data.correctIndex}. ${data.options[data.correctIndex] ?? "(none)"}
+MARKED CORRECT: ${data.correctIndex}
 
-Decide:
-- "solid" = question is unambiguous and the marked answer is right.
-- "ambiguous" = wording is unclear, multiple options could be right, or it depends on context.
-- "wrong" = the marked answer is factually incorrect.
+verdict: "solid" (clear + marked answer right) | "ambiguous" (unclear/multiple right) | "wrong" (marked answer false).
+confidence: 0-100 certainty.
 
-Also rate how certain you are, 0-100, based on how well-established and verifiable the facts and sources are.
+Output ONLY raw JSON, no fences:
+{"verdict":"...","confidence":0,"confidenceReason":"<=12 words","note":"1 short Gen-Z sentence","evidence":["2 bullets, <=12 words each"],"rejections":["1 bullet per wrong option, <=12 words, name the option"],"suggestedQuestion":"rewrite if not solid else \\"\\"","suggestedAnswer":"correct answer if not solid else \\"\\"","sources":[{"title":"","url":"https://..."}]}
 
-Reply with ONLY raw JSON (no fences):
-{"verdict":"solid|ambiguous|wrong","confidence":0-100,"confidenceReason":"1 short sentence on why you're this certain (source quality, how settled the fact is)","note":"1-2 sentences, Gen-Z friendly, explain the issue or confirm it checks out","evidence":["2-4 short bullets, each one concrete fact that supports the correct answer"],"rejections":["one short bullet per WRONG option explaining exactly why it is rejected — name the option"],"suggestedQuestion":"clearer rewrite, or empty string if solid","suggestedAnswer":"the correct answer, or empty string if solid","sources":[{"title":"source name","url":"https://..."}]}
+Max 1 source, only real stable pages (Wikipedia/official docs). Never invent URLs — use [] if unsure. Keep total output under 120 words.`;
 
-Evidence rules: bullets must be short (under 20 words), factual, and independently verifiable. Rejections must cover every option that is not the correct one.
-
-Source rules: only cite real, well-known, stable pages (Wikipedia, official docs, .edu/.gov). Never invent a URL — if you are not sure a URL exists, return an empty sources array. Always include at least one source when the verdict is not "solid" and you are confident it exists.`;
-
-    const result = streamText({ model: gateway("google/gemini-3-flash-preview"), prompt });
+    const result = streamText({
+      model: gateway("google/gemini-3-flash-preview"),
+      prompt,
+      maxOutputTokens: 500,
+      temperature: 0,
+    });
     const raw = (await result.text)
       .trim()
       .replace(/^```(?:json)?/i, "")

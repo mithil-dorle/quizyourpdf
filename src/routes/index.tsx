@@ -89,6 +89,25 @@ function Index() {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const makeQuiz = useServerFn(generateQuiz);
+  const prefetchCheck = useServerFn(factCheckQuestion);
+  const prefetching = useRef<Set<number>>(new Set());
+
+  // Warm the fact-check cache for the current + next question while the user is still reading,
+  // so the panel is instant once they lock in an answer.
+  useEffect(() => {
+    if (stage !== "playing" || !quiz) return;
+    for (const i of [current, current + 1]) {
+      const q = quiz.questions[i];
+      if (!q || factChecks[i] || prefetching.current.has(i)) continue;
+      prefetching.current.add(i);
+      prefetchCheck({
+        data: { question: q.question, options: q.options, correctIndex: q.correctIndex },
+      })
+        .then((r) => setFactChecks((prev) => (prev[i] ? prev : { ...prev, [i]: r })))
+        .catch(() => prefetching.current.delete(i));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage, quiz, current]);
 
   const handleFile = useCallback(async (file: File) => {
     setError(null);
@@ -854,24 +873,28 @@ function Results({
     startedRef.current = true;
     let alive = true;
     (async () => {
-      for (let i = 0; i < quiz.questions.length; i++) {
-        if (!alive) return;
-        if (factChecks[i]) continue;
-        const q = quiz.questions[i]!;
-        try {
-          const r = await checkFn({
-            data: {
-              question: q.question,
-              options: q.options,
-              correctIndex: q.correctIndex,
-            },
-          });
-          if (!alive) return;
-          onFactCheck(i, r);
-        } catch {
-          /* skip this one */
+      const queue = quiz.questions.map((q, i) => ({ q, i })).filter(({ i }) => !factChecks[i]);
+      let cursor = 0;
+      const worker = async () => {
+        while (alive) {
+          const job = queue[cursor++];
+          if (!job) return;
+          try {
+            const r = await checkFn({
+              data: {
+                question: job.q.question,
+                options: job.q.options,
+                correctIndex: job.q.correctIndex,
+              },
+            });
+            if (!alive) return;
+            onFactCheck(job.i, r);
+          } catch {
+            /* skip this one */
+          }
         }
-      }
+      };
+      await Promise.all(Array.from({ length: Math.min(5, queue.length) }, worker));
       if (alive) setChecking(false);
     })();
     return () => {
