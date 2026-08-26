@@ -3,7 +3,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Brain,
+  ClipboardList,
   Clock,
+  SkipForward,
+
   FileUp,
   Flame,
   Link as LinkIcon,
