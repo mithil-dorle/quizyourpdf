@@ -1030,3 +1030,29 @@ function Results({
     </section>
   );
 }
+
+function StatBox({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "success" | "destructive" | "muted";
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-secondary/40 px-3 py-4">
+      <p
+        className={cn(
+          "font-display text-2xl font-bold",
+          tone === "success" && "text-success",
+          tone === "destructive" && "text-destructive",
+          tone === "muted" && "text-muted-foreground",
+        )}
+      >
+        {value}
+      </p>
+      <p className="text-xs text-muted-foreground">{label}</p>
+    </div>
+  );
+}
