@@ -818,34 +818,141 @@ function FactCheckContent({ state }: { state: FactCheck }) {
 
 function Results({
   quiz,
+  mode,
   answers,
   score,
   bestStreak,
   factChecks,
+  onFactCheck,
   onReset,
 }: {
   quiz: Quiz;
+  mode: Mode;
   answers: (number | null)[];
   score: number;
   bestStreak: number;
   factChecks: Record<number, FactCheck>;
+  onFactCheck: (index: number, check: FactCheck) => void;
   onReset: () => void;
 }) {
   const total = quiz.questions.length;
   const pct = Math.round((score / total) * 100);
   const verdict =
     pct >= 85 ? "certified genius" : pct >= 60 ? "solid, keep cooking" : "we need a rerun";
+  const exam = mode === "exam";
+  const skipped = answers.filter((a) => a === null).length;
+  const wrong = total - score - skipped;
+
+  const checkFn = useServerFn(factCheckQuestion);
+  const [checking, setChecking] = useState(exam);
+  const startedRef = useRef(false);
+
+  useEffect(() => {
+    if (!exam || startedRef.current) return;
+    startedRef.current = true;
+    let alive = true;
+    (async () => {
+      for (let i = 0; i < quiz.questions.length; i++) {
+        if (!alive) return;
+        if (factChecks[i]) continue;
+        const q = quiz.questions[i]!;
+        try {
+          const r = await checkFn({
+            data: {
+              question: q.question,
+              options: q.options,
+              correctIndex: q.correctIndex,
+            },
+          });
+          if (!alive) return;
+          onFactCheck(i, r);
+        } catch {
+          /* skip this one */
+        }
+      }
+      if (alive) setChecking(false);
+    })();
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exam]);
+
+  const topics = useMemo(() => {
+    const map = new Map<string, { correct: number; total: number }>();
+    quiz.questions.forEach((q, i) => {
+      const row = map.get(q.topic) ?? { correct: 0, total: 0 };
+      row.total += 1;
+      if (answers[i] === q.correctIndex) row.correct += 1;
+      map.set(q.topic, row);
+    });
+    return [...map.entries()].sort((a, b) => b[1].total - a[1].total);
+  }, [quiz, answers]);
+
+  const checkedList = Object.values(factChecks);
+  const avgConfidence = checkedList.length
+    ? Math.round(checkedList.reduce((s, c) => s + c.confidence, 0) / checkedList.length)
+    : 0;
+  const flagged = checkedList.filter((c) => c.verdict !== "solid").length;
 
   return (
     <section className="space-y-6">
       <div className="surface-card glow-pink p-8 text-center">
         <Brain className="mx-auto mb-3 size-8 text-accent" />
+        {exam && (
+          <Badge className="mb-2 rounded-full bg-accent text-accent-foreground">
+            exam report
+          </Badge>
+        )}
         <p className="font-display text-6xl font-bold text-hype">{pct}%</p>
         <p className="mt-2 font-display text-xl font-bold">{verdict}</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          {score}/{total} correct · best streak {bestStreak} 🔥
+          {score}/{total} correct · {wrong} wrong · {skipped} skipped
+          {!exam && ` · best streak ${bestStreak} 🔥`}
         </p>
       </div>
+
+      <div className="surface-card space-y-5 p-6">
+        <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+          <ClipboardList className="size-5 text-primary" /> Analysis
+        </h2>
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <StatBox label="Correct" value={`${score}`} tone="success" />
+          <StatBox label="Wrong" value={`${wrong}`} tone="destructive" />
+          <StatBox label="Skipped" value={`${skipped}`} tone="muted" />
+        </div>
+        <div className="space-y-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            Topic breakdown
+          </p>
+          {topics.map(([topic, row]) => (
+            <div key={topic} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span>{topic}</span>
+                <span className="font-display font-bold text-primary">
+                  {row.correct}/{row.total}
+                </span>
+              </div>
+              <Progress value={(row.correct / row.total) * 100} className="h-1.5" />
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {checking
+            ? "Fact-checking every question…"
+            : checkedList.length
+              ? `Avg source confidence ${avgConfidence}% · ${flagged} question${flagged === 1 ? "" : "s"} flagged`
+              : "No fact-checks saved for this run."}
+        </p>
+      </div>
+
+      {exam && checking && (
+        <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" /> Running fact-checks on all{" "}
+          {total} questions…
+        </p>
+      )}
+
 
       <div className="space-y-3">
         {quiz.questions.map((q, i) => {
