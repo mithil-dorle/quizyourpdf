@@ -111,25 +111,58 @@ function Index() {
 
   const handleFile = useCallback(async (file: File) => {
     setError(null);
-    if (!file.name.toLowerCase().endsWith(".pdf")) {
-      setError("PDFs only, bestie.");
+    const MAX_MB = 25;
+    const isPdf =
+      file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+    if (!isPdf) {
+      const ext = file.name.includes(".")
+        ? file.name.split(".").pop()!.toUpperCase()
+        : "that";
+      setError(`${ext} files aren't supported yet — drop a .pdf instead.`);
+      return;
+    }
+    if (file.size === 0) {
+      setError("That file is empty (0 KB). Try re-exporting your PDF.");
+      return;
+    }
+    if (file.size > MAX_MB * 1024 * 1024) {
+      setError(
+        `Too chunky: ${(file.size / 1024 / 1024).toFixed(1)} MB. Max is ${MAX_MB} MB — split it up and try again.`,
+      );
       return;
     }
     setBusy("Reading your PDF…");
     try {
-      const text = await extractPdfText(file);
-      if (text.length < 200) {
-        setError("That PDF looks like scanned images — no text to read.");
+      const text = await Promise.race([
+        extractPdfText(file),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("timeout")), 60_000),
+        ),
+      ]);
+      if (text.trim().length < 200) {
+        setError(
+          "No readable text in there — looks like scanned images. Try a text-based PDF.",
+        );
         setBusy(null);
         return;
       }
       setPdfText(text);
       setFileName(file.name);
-    } catch {
-      setError("Couldn't read that file. Try another PDF.");
+    } catch (e) {
+      const msg = e instanceof Error ? `${e.name} ${e.message}` : "";
+      if (/timeout/i.test(msg)) {
+        setError("That PDF took too long (60s+). Try a smaller or shorter file.");
+      } else if (/password|Password/.test(msg)) {
+        setError("That PDF is password-protected. Unlock it, then re-upload.");
+      } else if (/Invalid|corrupt|structure/i.test(msg)) {
+        setError("That file looks corrupted or isn't a real PDF. Try another one.");
+      } else {
+        setError("Couldn't read that file. Try another PDF.");
+      }
     }
     setBusy(null);
   }, []);
+
 
   const start = async () => {
     setError(null);
