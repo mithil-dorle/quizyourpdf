@@ -17,8 +17,10 @@ export const Route = createFileRoute("/terms")({
           "The rules for using QuizLab: what you can upload, what we generate, and how we handle your content.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://quiz-genie-77.lovable.app/terms" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://quiz-genie-77.lovable.app/terms" }],
   }),
   component: TermsPage,
 });
