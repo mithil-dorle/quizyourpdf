@@ -77,14 +77,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "QuizLab — Turn any PDF into a quiz game" },
+      {
+        name: "description",
+        content:
+          "Upload your notes, get an instant AI-built quiz with timers, difficulty levels, streaks and source-backed fact-checks.",
+      },
+      { name: "author", content: "QuizLab" },
+      { property: "og:title", content: "QuizLab — Turn any PDF into a quiz game" },
+      {
+        property: "og:description",
+        content:
+          "Upload a PDF, pick your settings, and battle an AI-generated quiz with live scoring and instant feedback.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@QuizLab" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
