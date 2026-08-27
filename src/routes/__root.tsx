@@ -9,6 +9,30 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+function Footer() {
+  return (
+    <footer className="border-t border-border/50 bg-background/80 px-5 py-6 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-3xl flex-col items-center justify-between gap-3 sm:flex-row">
+        <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} QuizLab</p>
+        <nav className="flex items-center gap-6">
+          <Link
+            to="/how-it-works"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            How it works
+          </Link>
+          <Link
+            to="/terms"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Terms
+          </Link>
+        </nav>
+      </div>
+    </footer>
+  );
+}
+
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
