@@ -306,8 +306,9 @@ function Index() {
               {fileName ?? "Drop your PDF here"}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {fileName ? "locked in — tweak the settings below" : "or tap to browse (full PDF, no page limit)"}
+              {fileName ? "locked in — tweak the settings below" : "or tap to browse — text-based .pdf, up to 25 MB"}
             </p>
+
           </div>
 
           <div className="surface-card space-y-7 p-6">
