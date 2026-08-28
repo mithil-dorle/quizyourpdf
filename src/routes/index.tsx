@@ -254,15 +254,18 @@ function Index() {
   };
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10">
-      <header className="mb-10 flex items-center justify-between">
+    <main className="mx-auto min-h-screen w-full max-w-3xl px-4 py-6 sm:px-5 sm:py-10">
+      <header className="mb-6 flex items-center justify-between sm:mb-10">
         <div className="flex items-center gap-2">
           <span className="grid size-10 place-items-center rounded-2xl bg-primary text-primary-foreground">
             <Zap className="size-5" />
           </span>
           <span className="font-display text-xl font-bold">QuizLab</span>
         </div>
-        <Badge variant="outline" className="rounded-full border-accent/40 text-accent">
+        <Badge
+          variant="outline"
+          className="hidden rounded-full border-accent/40 text-accent sm:inline-flex"
+        >
           study, but a game
         </Badge>
       </header>
@@ -270,7 +273,7 @@ function Index() {
       {stage === "upload" && (
         <section className="space-y-8">
           <div className="space-y-3 text-center">
-            <h1 className="font-display text-5xl font-bold leading-[1.05] sm:text-6xl">
+            <h1 className="font-display text-4xl font-bold leading-[1.05] sm:text-6xl">
               drop a PDF.
               <br />
               <span className="text-hype">get quizzed.</span>
@@ -289,7 +292,7 @@ function Index() {
               if (file) void handleFile(file);
             }}
             onClick={() => inputRef.current?.click()}
-            className="surface-card glow-lime cursor-pointer p-10 text-center transition-transform hover:-translate-y-0.5"
+            className="surface-card glow-lime cursor-pointer p-6 text-center transition-transform hover:-translate-y-0.5 sm:p-10"
           >
             <input
               ref={inputRef}
@@ -311,7 +314,7 @@ function Index() {
 
           </div>
 
-          <div className="surface-card space-y-7 p-6">
+          <div className="surface-card space-y-7 p-5 sm:p-6">
             <h2 className="font-display text-lg font-bold">Quiz settings</h2>
 
             <SettingRow icon={<Target className="size-4" />} label="Questions" value={`${count}`}>
@@ -348,14 +351,14 @@ function Index() {
                     key={d.id}
                     onClick={() => setDifficulty(d.id)}
                     className={cn(
-                      "rounded-2xl border px-3 py-3 text-left transition-colors",
+                      "min-w-0 rounded-2xl border px-3 py-3 text-center transition-colors sm:text-left",
                       difficulty === d.id
                         ? "border-primary/60 bg-primary/15"
                         : "border-border bg-secondary/40 hover:bg-secondary",
                     )}
                   >
                     <span className="block font-display font-bold">{d.label}</span>
-                    <span className="text-xs text-muted-foreground">{d.sub}</span>
+                    <span className="hidden text-xs text-muted-foreground sm:block">{d.sub}</span>
                   </button>
                 ))}
               </div>
@@ -378,7 +381,7 @@ function Index() {
                     )}
                   >
                     <span className="block font-display font-bold">{m.label}</span>
-                    <span className="text-xs text-muted-foreground">{m.sub}</span>
+                    <span className="hidden text-xs text-muted-foreground sm:block">{m.sub}</span>
                   </button>
                 ))}
               </div>
@@ -518,16 +521,16 @@ function QuizPlay({
 
   return (
     <section className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="rounded-full">
-            Q{index + 1} / {quiz.questions.length}
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Badge variant="outline" className="shrink-0 rounded-full">
+            Q{index + 1}/{quiz.questions.length}
           </Badge>
           {exam && (
             <Badge className="rounded-full bg-accent text-accent-foreground">exam mode</Badge>
           )}
         </div>
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex shrink-0 items-center gap-2 text-sm sm:gap-3">
           {exam ? (
             <span className="flex items-center gap-1 text-primary">
               <ClipboardList className="size-4" /> {answeredCount}/{quiz.questions.length}
@@ -581,7 +584,7 @@ function QuizPlay({
         </div>
       )}
 
-      <div className="surface-card space-y-5 p-6">
+      <div className="surface-card space-y-5 p-5 sm:p-6">
         <div className="flex flex-wrap gap-2">
           <Badge className="rounded-full bg-secondary text-secondary-foreground">
             {q.topic}
@@ -590,7 +593,7 @@ function QuizPlay({
             {q.difficulty}
           </Badge>
         </div>
-        <h2 className="font-display text-2xl font-bold leading-snug">{q.question}</h2>
+        <h2 className="font-display text-xl font-bold leading-snug sm:text-2xl">{q.question}</h2>
 
         <div className="space-y-2">
           {q.options.map((option, i) => {
@@ -602,7 +605,7 @@ function QuizPlay({
                 disabled={revealed}
                 onClick={() => onPick(i)}
                 className={cn(
-                  "w-full rounded-2xl border px-4 py-3 text-left transition-colors",
+                  "w-full rounded-2xl border px-3.5 py-3 text-left text-sm transition-colors sm:px-4 sm:text-base",
                   !revealed &&
                     (exam && isPicked
                       ? "border-primary/60 bg-primary/15"
@@ -658,10 +661,10 @@ function QuizPlay({
 
       {exam ? (
         <div className="space-y-2">
-          <div className="flex gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <Button
               variant="secondary"
-              className="h-14 flex-1 rounded-2xl font-bold"
+              className="h-12 rounded-2xl font-bold sm:h-14"
               disabled={index === 0}
               onClick={() => onJump(index - 1)}
             >
@@ -669,13 +672,13 @@ function QuizPlay({
             </Button>
             <Button
               variant="secondary"
-              className="h-14 flex-1 rounded-2xl font-bold"
+              className="h-12 rounded-2xl font-bold sm:h-14"
               onClick={onSkip}
             >
-              <SkipForward className="mr-2 size-5" /> Skip
+              <SkipForward className="mr-1.5 size-4 sm:mr-2 sm:size-5" /> Skip
             </Button>
             <Button
-              className="h-14 flex-1 rounded-2xl font-bold"
+              className="h-12 rounded-2xl font-bold sm:h-14"
               disabled={last}
               onClick={onNext}
             >
@@ -685,7 +688,7 @@ function QuizPlay({
           <Button
             size="lg"
             variant={answeredCount === quiz.questions.length || last ? "default" : "outline"}
-            className="h-14 w-full rounded-2xl text-base font-bold"
+            className="h-12 w-full rounded-2xl text-sm font-bold sm:h-14 sm:text-base"
             onClick={onSubmit}
           >
             Submit exam ({answeredCount}/{quiz.questions.length} answered)
@@ -956,22 +959,22 @@ function Results({
 
   return (
     <section className="space-y-6">
-      <div className="surface-card glow-pink p-8 text-center">
+      <div className="surface-card glow-pink p-6 text-center sm:p-8">
         <Brain className="mx-auto mb-3 size-8 text-accent" />
         {exam && (
           <Badge className="mb-2 rounded-full bg-accent text-accent-foreground">
             exam report
           </Badge>
         )}
-        <p className="font-display text-6xl font-bold text-hype">{pct}%</p>
-        <p className="mt-2 font-display text-xl font-bold">{verdict}</p>
+        <p className="font-display text-5xl font-bold text-hype sm:text-6xl">{pct}%</p>
+        <p className="mt-2 font-display text-lg font-bold sm:text-xl">{verdict}</p>
         <p className="mt-1 text-sm text-muted-foreground">
           {score}/{total} correct · {wrong} wrong · {skipped} skipped
           {!exam && ` · best streak ${bestStreak} 🔥`}
         </p>
       </div>
 
-      <div className="surface-card space-y-5 p-6">
+      <div className="surface-card space-y-5 p-5 sm:p-6">
         <h2 className="flex items-center gap-2 font-display text-lg font-bold">
           <ClipboardList className="size-5 text-primary" /> Analysis
         </h2>
@@ -1018,9 +1021,9 @@ function Results({
           const picked = answers[i] ?? null;
           const ok = picked === q.correctIndex;
           return (
-            <div key={i} className="surface-card space-y-2 p-5">
+            <div key={i} className="surface-card space-y-2 p-4 sm:p-5">
               <div className="flex items-start justify-between gap-3">
-                <p className="font-display font-bold">
+                <p className="min-w-0 font-display text-sm font-bold sm:text-base">
                   {i + 1}. {q.question}
                 </p>
                 <Badge
