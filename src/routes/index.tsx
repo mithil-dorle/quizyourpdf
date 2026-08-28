@@ -448,8 +448,11 @@ function Index() {
           factChecks={factChecks}
           onFactCheck={(i, c) => setFactChecks((prev) => ({ ...prev, [i]: c }))}
           onReset={reset}
+          onRegenerate={regenerate}
+          regenerating={regenerating}
+          canRegenerate={pdfText.trim().length > 0}
         />
-      )}
+
 
     </main>
   );
