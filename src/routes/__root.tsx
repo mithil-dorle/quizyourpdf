@@ -137,13 +137,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
     ],
-    scripts: [
-      {
-        async: true,
-        crossOrigin: "anonymous",
-        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3288061203330387",
-      },
-    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -165,8 +158,21 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+const ADSENSE_SRC =
+  "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3288061203330387";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  // Loaded after hydration: AdSense injects DOM nodes and breaks SSR hydration otherwise.
+  useEffect(() => {
+    if (document.querySelector(`script[src="${ADSENSE_SRC}"]`)) return;
+    const script = document.createElement("script");
+    script.src = ADSENSE_SRC;
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    document.head.appendChild(script);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
