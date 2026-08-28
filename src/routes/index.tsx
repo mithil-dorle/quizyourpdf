@@ -1099,14 +1099,36 @@ function Results({
         })}
       </div>
 
-      <Button
-        size="lg"
-        variant="secondary"
-        className="h-14 w-full rounded-2xl text-base font-bold"
-        onClick={onReset}
-      >
-        <RotateCcw className="mr-2 size-5" /> New PDF
-      </Button>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Button
+          size="lg"
+          variant="secondary"
+          className="h-14 w-full rounded-2xl text-base font-bold"
+          onClick={onReset}
+          disabled={regenerating}
+        >
+          <RotateCcw className="mr-2 size-5" /> New PDF
+        </Button>
+        {canRegenerate && (
+          <Button
+            size="lg"
+            className="h-14 w-full rounded-2xl text-base font-bold"
+            onClick={onRegenerate}
+            disabled={regenerating}
+          >
+            {regenerating ? (
+              <>
+                <Loader2 className="mr-2 size-5 animate-spin" /> Cooking new set…
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 size-5" /> New questions, same PDF
+              </>
+            )}
+          </Button>
+        )}
+      </div>
+
     </section>
   );
 }
