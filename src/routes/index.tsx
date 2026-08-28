@@ -253,6 +253,14 @@ function Index() {
     setFileName(null);
   };
 
+  const [regenerating, setRegenerating] = useState(false);
+  const regenerate = async () => {
+    setRegenerating(true);
+    await start();
+    setRegenerating(false);
+  };
+
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-4 py-6 sm:px-5 sm:py-10">
       <header className="mb-6 flex items-center justify-between sm:mb-10">
@@ -440,8 +448,13 @@ function Index() {
           factChecks={factChecks}
           onFactCheck={(i, c) => setFactChecks((prev) => ({ ...prev, [i]: c }))}
           onReset={reset}
+          onRegenerate={regenerate}
+          regenerating={regenerating}
+          canRegenerate={pdfText.trim().length > 0}
         />
       )}
+
+
 
     </main>
   );
@@ -883,6 +896,10 @@ function Results({
   factChecks,
   onFactCheck,
   onReset,
+  onRegenerate,
+  regenerating,
+  canRegenerate,
+
 }: {
   quiz: Quiz;
   mode: Mode;
@@ -892,6 +909,10 @@ function Results({
   factChecks: Record<number, FactCheck>;
   onFactCheck: (index: number, check: FactCheck) => void;
   onReset: () => void;
+  onRegenerate: () => void;
+  regenerating: boolean;
+  canRegenerate: boolean;
+
 }) {
   const total = quiz.questions.length;
   const pct = Math.round((score / total) * 100);
@@ -1078,14 +1099,36 @@ function Results({
         })}
       </div>
 
-      <Button
-        size="lg"
-        variant="secondary"
-        className="h-14 w-full rounded-2xl text-base font-bold"
-        onClick={onReset}
-      >
-        <RotateCcw className="mr-2 size-5" /> New PDF
-      </Button>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Button
+          size="lg"
+          variant="secondary"
+          className="h-14 w-full rounded-2xl text-base font-bold"
+          onClick={onReset}
+          disabled={regenerating}
+        >
+          <RotateCcw className="mr-2 size-5" /> New PDF
+        </Button>
+        {canRegenerate && (
+          <Button
+            size="lg"
+            className="h-14 w-full rounded-2xl text-base font-bold"
+            onClick={onRegenerate}
+            disabled={regenerating}
+          >
+            {regenerating ? (
+              <>
+                <Loader2 className="mr-2 size-5 animate-spin" /> Cooking new set…
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 size-5" /> New questions, same PDF
+              </>
+            )}
+          </Button>
+        )}
+      </div>
+
     </section>
   );
 }
