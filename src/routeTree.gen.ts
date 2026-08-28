@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as StudyGuideGeneratorRouteImport } from './routes/study-guide-generator'
 import { Route as TermsRouteImport } from './routes/terms'
 
 const IndexRoute = IndexRouteImport.update({
@@ -35,6 +36,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudyGuideGeneratorRoute = StudyGuideGeneratorRouteImport.update({
+  id: '/study-guide-generator',
+  path: '/study-guide-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/study-guide-generator': typeof StudyGuideGeneratorRoute
   '/terms': typeof TermsRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/study-guide-generator': typeof StudyGuideGeneratorRoute
   '/terms': typeof TermsRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,34 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/study-guide-generator': typeof StudyGuideGeneratorRoute
   '/terms': typeof TermsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/faq' | '/how-it-works' | '/sitemap.xml' | '/terms'
+  fullPaths:
+    | '/'
+    | '/faq'
+    | '/how-it-works'
+    | '/sitemap.xml'
+    | '/study-guide-generator'
+    | '/terms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/faq' | '/how-it-works' | '/sitemap.xml' | '/terms'
-  id: '__root__' | '/' | '/faq' | '/how-it-works' | '/sitemap.xml' | '/terms'
+  to:
+    | '/'
+    | '/faq'
+    | '/how-it-works'
+    | '/sitemap.xml'
+    | '/study-guide-generator'
+    | '/terms'
+  id:
+    | '__root__'
+    | '/'
+    | '/faq'
+    | '/how-it-works'
+    | '/sitemap.xml'
+    | '/study-guide-generator'
+    | '/terms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +104,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   HowItWorksRoute: typeof HowItWorksRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StudyGuideGeneratorRoute: typeof StudyGuideGeneratorRoute
   TermsRoute: typeof TermsRoute
 }
 
@@ -109,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/study-guide-generator': {
+      id: '/study-guide-generator'
+      path: '/study-guide-generator'
+      fullPath: '/study-guide-generator'
+      preLoaderRoute: typeof StudyGuideGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -124,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   HowItWorksRoute: HowItWorksRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StudyGuideGeneratorRoute: StudyGuideGeneratorRoute,
   TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
