@@ -452,6 +452,8 @@ function Index() {
           regenerating={regenerating}
           canRegenerate={pdfText.trim().length > 0}
         />
+      )}
+
 
 
     </main>
