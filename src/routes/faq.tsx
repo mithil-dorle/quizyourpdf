@@ -1,30 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Zap, HelpCircle, FileText, Brain, Clock, ShieldCheck, Sparkles } from "lucide-react";
 
-export const Route = createFileRoute("/faq")({
-  head: () => ({
-    meta: [
-      { title: "FAQ — QuizLab" },
-      {
-        name: "description",
-        content:
-          "Got questions about uploading PDFs, AI quiz generation, or fact-check timing? Find the answers here.",
-      },
-      { property: "og:title", content: "FAQ — QuizLab" },
-      {
-        property: "og:description",
-        content:
-          "Common questions about PDF uploads, quiz generation, and how QuizLab fact-checks your answers.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://quiz-genie-77.lovable.app/faq" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [{ rel: "canonical", href: "https://quiz-genie-77.lovable.app/faq" }],
-  }),
-  component: FaqPage,
-});
-
 const FAQS = [
   {
     icon: FileText,
@@ -63,6 +39,49 @@ const FAQS = [
       "Nope. Your PDF is processed in your browser session and not saved on our servers. Quiz data lives locally while you play.",
   },
 ];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.answer,
+    },
+  })),
+};
+
+export const Route = createFileRoute("/faq")({
+  head: () => ({
+    meta: [
+      { title: "FAQ — QuizLab" },
+      {
+        name: "description",
+        content:
+          "Got questions about uploading PDFs, AI quiz generation, or fact-check timing? Find the answers here.",
+      },
+      { property: "og:title", content: "FAQ — QuizLab" },
+      {
+        property: "og:description",
+        content:
+          "Common questions about PDF uploads, quiz generation, and how QuizLab fact-checks your answers.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://quiz-genie-77.lovable.app/faq" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://quiz-genie-77.lovable.app/faq" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(faqJsonLd),
+      },
+    ],
+  }),
+  component: FaqPage,
+});
 
 function FaqPage() {
   return (
