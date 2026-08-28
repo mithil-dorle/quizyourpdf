@@ -253,6 +253,14 @@ function Index() {
     setFileName(null);
   };
 
+  const [regenerating, setRegenerating] = useState(false);
+  const regenerate = async () => {
+    setRegenerating(true);
+    await start();
+    setRegenerating(false);
+  };
+
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-4 py-6 sm:px-5 sm:py-10">
       <header className="mb-6 flex items-center justify-between sm:mb-10">
