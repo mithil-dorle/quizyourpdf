@@ -30,21 +30,23 @@ import { factCheckQuestion, type FactCheck } from "@/lib/factcheck.functions";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "QuizLab — Turn any PDF into a quiz game" },
+      { title: "PDF to Quiz Generator — QuizLab" },
       {
         name: "description",
         content:
-          "Upload your notes, get an instant AI-built quiz with timers, difficulty levels and per-question feedback. Studying, but make it a game.",
+          "Upload a PDF and get an AI-built multiple-choice quiz in seconds, with timers, difficulty levels, streaks and fact-checked answers.",
       },
-      { property: "og:title", content: "QuizLab — Turn any PDF into a quiz game" },
+      { property: "og:title", content: "PDF to Quiz Generator — QuizLab" },
       {
         property: "og:description",
         content:
-          "Upload a PDF, pick your settings, and battle an AI-generated quiz with live scoring and instant feedback.",
+          "Turn your notes into a timed AI quiz: pick question count, difficulty and mode, then play with instant fact-checked feedback.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://quizyourpdf.com/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://quizyourpdf.com/" }],
   }),
   component: Index,
 });
@@ -327,6 +329,7 @@ function Index() {
 
             <SettingRow icon={<Target className="size-4" />} label="Questions" value={`${count}`}>
               <Slider
+                aria-label="Number of questions"
                 value={[count]}
                 min={3}
                 max={20}
@@ -341,6 +344,7 @@ function Index() {
               value={`${minutes} min`}
             >
               <Slider
+                aria-label="Time limit in minutes"
                 value={[minutes]}
                 min={1}
                 max={30}
@@ -581,6 +585,8 @@ function QuizPlay({
           {quiz.questions.map((_, i) => (
             <button
               key={i}
+              aria-label={`Go to question ${i + 1}`}
+              aria-current={i === index ? "true" : undefined}
               onClick={() => onJump(i)}
               className={cn(
                 "size-8 rounded-lg border font-display text-xs font-bold transition-colors",

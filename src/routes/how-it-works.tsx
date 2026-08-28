@@ -26,10 +26,10 @@ export const Route = createFileRoute("/how-it-works")({
           "Upload a PDF, pick your settings, and play an AI-built quiz with instant feedback and source-backed fact-checks.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://quiz-genie-77.lovable.app/how-it-works" },
+      { property: "og:url", content: "https://quizyourpdf.com/how-it-works" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://quiz-genie-77.lovable.app/how-it-works" }],
+    links: [{ rel: "canonical", href: "https://quizyourpdf.com/how-it-works" }],
   }),
   component: HowItWorksPage,
 });
