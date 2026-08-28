@@ -16,6 +16,12 @@ function Footer() {
         <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} QuizLab</p>
         <nav className="flex flex-wrap items-center justify-center gap-6">
           <Link
+            to="/study-guide-generator"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Study guide generator
+          </Link>
+          <Link
             to="/how-it-works"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
