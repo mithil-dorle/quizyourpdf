@@ -254,15 +254,18 @@ function Index() {
   };
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10">
-      <header className="mb-10 flex items-center justify-between">
+    <main className="mx-auto min-h-screen w-full max-w-3xl px-4 py-6 sm:px-5 sm:py-10">
+      <header className="mb-6 flex items-center justify-between sm:mb-10">
         <div className="flex items-center gap-2">
           <span className="grid size-10 place-items-center rounded-2xl bg-primary text-primary-foreground">
             <Zap className="size-5" />
           </span>
           <span className="font-display text-xl font-bold">QuizLab</span>
         </div>
-        <Badge variant="outline" className="rounded-full border-accent/40 text-accent">
+        <Badge
+          variant="outline"
+          className="hidden rounded-full border-accent/40 text-accent sm:inline-flex"
+        >
           study, but a game
         </Badge>
       </header>
@@ -270,7 +273,7 @@ function Index() {
       {stage === "upload" && (
         <section className="space-y-8">
           <div className="space-y-3 text-center">
-            <h1 className="font-display text-5xl font-bold leading-[1.05] sm:text-6xl">
+            <h1 className="font-display text-4xl font-bold leading-[1.05] sm:text-6xl">
               drop a PDF.
               <br />
               <span className="text-hype">get quizzed.</span>
@@ -289,7 +292,7 @@ function Index() {
               if (file) void handleFile(file);
             }}
             onClick={() => inputRef.current?.click()}
-            className="surface-card glow-lime cursor-pointer p-10 text-center transition-transform hover:-translate-y-0.5"
+            className="surface-card glow-lime cursor-pointer p-6 text-center transition-transform hover:-translate-y-0.5 sm:p-10"
           >
             <input
               ref={inputRef}
@@ -311,7 +314,7 @@ function Index() {
 
           </div>
 
-          <div className="surface-card space-y-7 p-6">
+          <div className="surface-card space-y-7 p-5 sm:p-6">
             <h2 className="font-display text-lg font-bold">Quiz settings</h2>
 
             <SettingRow icon={<Target className="size-4" />} label="Questions" value={`${count}`}>
@@ -348,14 +351,14 @@ function Index() {
                     key={d.id}
                     onClick={() => setDifficulty(d.id)}
                     className={cn(
-                      "rounded-2xl border px-3 py-3 text-left transition-colors",
+                      "min-w-0 rounded-2xl border px-3 py-3 text-center transition-colors sm:text-left",
                       difficulty === d.id
                         ? "border-primary/60 bg-primary/15"
                         : "border-border bg-secondary/40 hover:bg-secondary",
                     )}
                   >
                     <span className="block font-display font-bold">{d.label}</span>
-                    <span className="text-xs text-muted-foreground">{d.sub}</span>
+                    <span className="hidden text-xs text-muted-foreground sm:block">{d.sub}</span>
                   </button>
                 ))}
               </div>
@@ -378,7 +381,7 @@ function Index() {
                     )}
                   >
                     <span className="block font-display font-bold">{m.label}</span>
-                    <span className="text-xs text-muted-foreground">{m.sub}</span>
+                    <span className="hidden text-xs text-muted-foreground sm:block">{m.sub}</span>
                   </button>
                 ))}
               </div>
