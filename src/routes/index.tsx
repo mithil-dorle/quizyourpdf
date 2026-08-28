@@ -909,6 +909,10 @@ function Results({
   factChecks: Record<number, FactCheck>;
   onFactCheck: (index: number, check: FactCheck) => void;
   onReset: () => void;
+  onRegenerate: () => void;
+  regenerating: boolean;
+  canRegenerate: boolean;
+
 }) {
   const total = quiz.questions.length;
   const pct = Math.round((score / total) * 100);
