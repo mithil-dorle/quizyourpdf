@@ -896,6 +896,10 @@ function Results({
   factChecks,
   onFactCheck,
   onReset,
+  onRegenerate,
+  regenerating,
+  canRegenerate,
+
 }: {
   quiz: Quiz;
   mode: Mode;
