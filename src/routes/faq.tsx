@@ -69,10 +69,10 @@ export const Route = createFileRoute("/faq")({
           "Common questions about PDF uploads, quiz generation, and how QuizLab fact-checks your answers.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://quiz-genie-77.lovable.app/faq" },
+      { property: "og:url", content: "https://quizyourpdf.com/faq" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://quiz-genie-77.lovable.app/faq" }],
+    links: [{ rel: "canonical", href: "https://quizyourpdf.com/faq" }],
     scripts: [
       {
         type: "application/ld+json",
