@@ -1,6 +1,58 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Zap, HelpCircle, FileText, Brain, Clock, ShieldCheck, Sparkles } from "lucide-react";
 
+const FAQS = [
+  {
+    icon: FileText,
+    question: "What kind of PDFs can I upload?",
+    answer:
+      "Any PDF with readable text works — notes, slides, textbook chapters, even scanned docs if the text layer is there. We read the whole PDF, so go ahead and drop that 200-page unit.",
+  },
+  {
+    icon: Brain,
+    question: "How does the AI generate the quiz?",
+    answer:
+      "The AI reads your PDF, picks out key concepts, and turns them into multiple-choice questions. You choose the number of questions, difficulty, and time limit before it cooks.",
+  },
+  {
+    icon: Clock,
+    question: "How long does fact-checking take?",
+    answer:
+      "Usually a few seconds per question. We keep answers short and run checks in parallel, so even a full exam review finishes fast. If a source is slow, we still show you the AI verdict and reasoning.",
+  },
+  {
+    icon: ShieldCheck,
+    question: "What does the confidence score mean?",
+    answer:
+      "It’s a 0–100 score showing how sure the fact-check is based on available sources. A high score means the evidence is solid; a low score means the topic is niche or sources disagree.",
+  },
+  {
+    icon: Sparkles,
+    question: "Can I use QuizLab for exam prep?",
+    answer:
+      "Absolutely. Exam mode hides answers until the end and gives you a full breakdown with topic accuracy, skipped questions, and bulk fact-checking after you submit.",
+  },
+  {
+    icon: HelpCircle,
+    question: "Is my PDF stored anywhere?",
+    answer:
+      "Nope. Your PDF is processed in your browser session and not saved on our servers. Quiz data lives locally while you play.",
+  },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.answer,
+    },
+  })),
+};
+
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
@@ -21,9 +73,16 @@ export const Route = createFileRoute("/faq")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: "https://quiz-genie-77.lovable.app/faq" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(faqJsonLd),
+      },
+    ],
   }),
   component: FaqPage,
 });
+
 
 const FAQS = [
   {
