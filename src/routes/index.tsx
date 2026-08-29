@@ -26,6 +26,8 @@ import { cn } from "@/lib/utils";
 import { extractPdfText } from "@/lib/pdf";
 import { generateQuiz, type Quiz, type QuizQuestion } from "@/lib/quiz.functions";
 import { factCheckQuestion, type FactCheck } from "@/lib/factcheck.functions";
+import { FeedbackForm } from "@/components/FeedbackForm";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -418,8 +420,11 @@ function Index() {
               </>
             )}
           </Button>
+
+          <FeedbackForm />
         </section>
       )}
+
 
       {stage === "playing" && questions[current] && (
         <QuizPlay
@@ -1135,9 +1140,11 @@ function Results({
         )}
       </div>
 
+      <FeedbackForm />
     </section>
   );
 }
+
 
 function StatBox({
   label,
