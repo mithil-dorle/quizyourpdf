@@ -418,8 +418,11 @@ function Index() {
               </>
             )}
           </Button>
+
+          <FeedbackForm />
         </section>
       )}
+
 
       {stage === "playing" && questions[current] && (
         <QuizPlay
