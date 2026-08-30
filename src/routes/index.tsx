@@ -5,6 +5,7 @@ import {
   Brain,
   ClipboardList,
   Clock,
+  Gamepad2,
   SkipForward,
   FileUp,
   Flame,
@@ -13,9 +14,11 @@ import {
   Pause,
   RotateCcw,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
   Target,
   Trophy,
+  Upload,
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
