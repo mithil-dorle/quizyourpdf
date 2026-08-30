@@ -526,6 +526,78 @@ function HowItWorksMini() {
   );
 }
 
+const TESTIMONIALS = [
+  {
+    name: "Ava R.",
+    role: "Bio major",
+    avatar: "AR",
+    color: "bg-primary text-primary-foreground",
+    stars: 5,
+    quote: "I uploaded my 60-page anatomy notes and got a fire quiz in like 30 seconds. The fact-check actually caught a sus question.",
+  },
+  {
+    name: "Marcus T.",
+    role: "CS student",
+    avatar: "MT",
+    color: "bg-accent text-accent-foreground",
+    stars: 5,
+    quote: "Exam mode hits different. No spoilers, full breakdown at the end, and I can finally trust the source confidence scores.",
+  },
+  {
+    name: "Priya K.",
+    role: "High school senior",
+    avatar: "PK",
+    color: "bg-secondary text-secondary-foreground",
+    stars: 4,
+    quote: "Way better than Quizlet. It reads the whole PDF and the questions actually match what I studied. 10/10 would cram again.",
+  },
+];
+
+function TestimonialsMini() {
+  return (
+    <div className="surface-card space-y-5 p-5 sm:p-6">
+      <div className="text-center">
+        <h2 className="font-display text-xl font-bold">
+          the <span className="text-hype">vibe check</span>
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          real students who turned their notes into a game
+        </p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {TESTIMONIALS.map((t) => (
+          <div
+            key={t.name}
+            className="space-y-3 rounded-2xl border border-border bg-secondary/40 p-4 transition-transform hover:-translate-y-0.5"
+          >
+            <div className="flex items-center gap-3">
+              <span className={cn("grid size-10 place-items-center rounded-full font-display text-sm font-bold", t.color)}>
+                {t.avatar}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate font-display text-sm font-bold">{t.name}</p>
+                <p className="text-xs text-muted-foreground">{t.role}</p>
+              </div>
+            </div>
+            <div className="flex gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className={cn(
+                    "size-3.5",
+                    i < t.stars ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/40",
+                  )}
+                />
+              ))}
+            </div>
+            <p className="text-sm leading-relaxed text-muted-foreground">"{t.quote}"</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SettingRow({
   icon,
   label,
