@@ -424,6 +424,7 @@ function Index() {
           </Button>
 
           <HowItWorksMini />
+          <TestimonialsMini />
         </section>
       )}
 
