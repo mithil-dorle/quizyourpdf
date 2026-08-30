@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
+  Star,
   Target,
   Trophy,
   Upload,
