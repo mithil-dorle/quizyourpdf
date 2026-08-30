@@ -469,6 +469,62 @@ function Index() {
   );
 }
 
+const HOW_STEPS = [
+  {
+    icon: Upload,
+    title: "Drop your PDF",
+    body: "Upload notes, slides or any text-based PDF — no page cap.",
+  },
+  {
+    icon: SlidersHorizontal,
+    title: "Set the vibe",
+    body: "Pick question count, time limit, difficulty and mode.",
+  },
+  {
+    icon: Brain,
+    title: "AI builds it",
+    body: "Our AI reads your material and crafts multiple-choice questions.",
+  },
+  {
+    icon: Gamepad2,
+    title: "Play & learn",
+    body: "Race the timer, build streaks, and get instant feedback.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Fact-checked",
+    body: "Each answer is cross-checked with sources and confidence scores.",
+  },
+];
+
+function HowItWorksMini() {
+  return (
+    <div className="surface-card space-y-5 p-5 sm:p-6">
+      <div className="text-center">
+        <h2 className="font-display text-xl font-bold">
+          how it <span className="text-hype">works</span>
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          from PDF to game-mode studying in four taps
+        </p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {HOW_STEPS.map((step) => (
+          <div key={step.title} className="flex items-start gap-3 rounded-2xl border border-border bg-secondary/40 p-4">
+            <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent/10 text-accent">
+              <step.icon className="size-5" />
+            </span>
+            <div>
+              <h3 className="font-display text-sm font-bold">{step.title}</h3>
+              <p className="text-xs leading-relaxed text-muted-foreground">{step.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SettingRow({
   icon,
   label,
