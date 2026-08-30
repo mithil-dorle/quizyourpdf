@@ -21,6 +21,7 @@ export type Database = {
           id: string
           kind: string
           message: string
+          name: string | null
           rating: number | null
         }
         Insert: {
@@ -29,6 +30,7 @@ export type Database = {
           id?: string
           kind?: string
           message: string
+          name?: string | null
           rating?: number | null
         }
         Update: {
@@ -37,6 +39,7 @@ export type Database = {
           id?: string
           kind?: string
           message?: string
+          name?: string | null
           rating?: number | null
         }
         Relationships: []
