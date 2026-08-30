@@ -41,6 +41,7 @@ const schema = z.object({
 
 export function FeedbackForm({ className }: { className?: string }) {
   const [kind, setKind] = useState<Kind>("feedback");
+  const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [rating, setRating] = useState<number | null>(null);
   const [email, setEmail] = useState("");
@@ -49,7 +50,7 @@ export function FeedbackForm({ className }: { className?: string }) {
 
   async function submit() {
     setError(null);
-    const parsed = schema.safeParse({ kind, message, rating, email });
+    const parsed = schema.safeParse({ kind, name, message, rating, email });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Check the form and try again.");
       return;
@@ -57,6 +58,7 @@ export function FeedbackForm({ className }: { className?: string }) {
     setStatus("sending");
     const { error: dbError } = await supabase.from("feedback").insert({
       kind: parsed.data.kind,
+      name: parsed.data.name ? parsed.data.name : null,
       message: parsed.data.message,
       rating: parsed.data.rating,
       email: parsed.data.email ? parsed.data.email : null,
@@ -67,6 +69,7 @@ export function FeedbackForm({ className }: { className?: string }) {
       return;
     }
     setStatus("done");
+    setName("");
     setMessage("");
     setRating(null);
     setEmail("");
