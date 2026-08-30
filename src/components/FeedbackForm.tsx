@@ -18,6 +18,12 @@ type Kind = (typeof KINDS)[number]["id"];
 
 const schema = z.object({
   kind: z.enum(["feedback", "suggestion", "feature", "bug"]),
+  name: z
+    .string()
+    .trim()
+    .max(100, { message: "That name is too long." })
+    .optional()
+    .or(z.literal("")),
   message: z
     .string()
     .trim()
