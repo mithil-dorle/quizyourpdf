@@ -157,6 +157,15 @@ export function FeedbackForm({ className }: { className?: string }) {
           />
 
           <Input
+            value={name}
+            maxLength={100}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Name (optional)"
+            aria-label="Your name (optional)"
+            className="rounded-2xl"
+          />
+
+          <Input
             value={email}
             maxLength={255}
             onChange={(e) => setEmail(e.target.value)}
