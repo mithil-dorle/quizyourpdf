@@ -55,10 +55,10 @@ export function FeedbackForm({ className }: { className?: string }) {
 
   if (done) {
     return (
-      <section className={cn("surface-card rounded-3xl p-6 text-center sm:p-8", className)}>
-        <MessageSquareHeart className="mx-auto size-8 text-primary" />
-        <h2 className="mt-3 font-display text-xl font-bold">sent it 🫡</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+      <section className={cn("surface-card rounded-2xl p-5 text-center", className)}>
+        <MessageSquareHeart className="mx-auto size-7 text-primary" />
+        <h2 className="mt-2 font-display text-lg font-bold">sent it 🫡</h2>
+        <p className="mt-0.5 text-xs text-muted-foreground">
           Thanks {name.trim() || "legend"} — your {kind === "feature" ? "feature request" : kind} is
           in our inbox.
         </p>
@@ -67,20 +67,23 @@ export function FeedbackForm({ className }: { className?: string }) {
   }
 
   return (
-    <section className={cn("surface-card rounded-3xl p-5 sm:p-8", className)}>
-      <div className="text-center">
-        <h2 className="font-display text-2xl font-bold sm:text-3xl">
-          got <span className="text-hype">thoughts?</span>
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Feedback, suggestions or a feature you want — drop it here.
-        </p>
+    <section className={cn("surface-card rounded-2xl p-4 sm:p-5", className)}>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="font-display text-lg font-bold leading-tight">
+            got <span className="text-hype">thoughts?</span>
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Feedback, suggestion or feature request.
+          </p>
+        </div>
+        <MessageSquareHeart className="size-6 shrink-0 text-primary" />
       </div>
 
-      <form onSubmit={submit} className="mt-6 space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <label htmlFor="fb-name" className="text-xs font-semibold text-muted-foreground">
+      <form onSubmit={submit} className="mt-4 space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label htmlFor="fb-name" className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
               Name
             </label>
             <input
@@ -89,11 +92,11 @@ export function FeedbackForm({ className }: { className?: string }) {
               onChange={(e) => setName(e.target.value)}
               maxLength={100}
               placeholder="your name"
-              className="h-12 w-full rounded-2xl border border-border bg-secondary/40 px-4 text-sm outline-none focus:border-primary"
+              className="h-10 w-full rounded-xl border border-border bg-secondary/40 px-3 text-sm outline-none focus:border-primary"
             />
           </div>
-          <div className="space-y-1.5">
-            <label htmlFor="fb-email" className="text-xs font-semibold text-muted-foreground">
+          <div className="space-y-1">
+            <label htmlFor="fb-email" className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
               Email
             </label>
             <input
@@ -103,56 +106,58 @@ export function FeedbackForm({ className }: { className?: string }) {
               onChange={(e) => setEmail(e.target.value)}
               maxLength={255}
               placeholder="you@mail.com"
-              className="h-12 w-full rounded-2xl border border-border bg-secondary/40 px-4 text-sm outline-none focus:border-primary"
+              className="h-10 w-full rounded-xl border border-border bg-secondary/40 px-3 text-sm outline-none focus:border-primary"
             />
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <span className="text-xs font-semibold text-muted-foreground">Type</span>
-          <div className="grid grid-cols-3 gap-2">
-            {KINDS.map((k) => (
-              <button
-                key={k.id}
-                type="button"
-                onClick={() => setKind(k.id)}
-                className={cn(
-                  "h-11 rounded-2xl border border-border text-xs font-bold transition-colors",
-                  kind === k.id
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "bg-secondary/40 text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {k.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-1.5">
-          <span className="text-xs font-semibold text-muted-foreground">Rating</span>
-          <div className="flex gap-1">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                type="button"
-                aria-label={`Rate ${n} out of 5`}
-                onClick={() => setRating(n === rating ? 0 : n)}
-                className="p-1"
-              >
-                <Star
+        <div className="grid grid-cols-[1fr_auto] items-end gap-3">
+          <div className="space-y-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Type</span>
+            <div className="grid grid-cols-3 gap-1.5">
+              {KINDS.map((k) => (
+                <button
+                  key={k.id}
+                  type="button"
+                  onClick={() => setKind(k.id)}
                   className={cn(
-                    "size-7",
-                    n <= rating ? "fill-primary text-primary" : "text-muted-foreground",
+                    "h-9 rounded-xl border border-border text-[11px] font-bold transition-colors",
+                    kind === k.id
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "bg-secondary/40 text-muted-foreground hover:text-foreground",
                   )}
-                />
-              </button>
-            ))}
+                >
+                  {k.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Rate</span>
+            <div className="flex h-9 items-center gap-0.5 rounded-xl border border-border bg-secondary/40 px-2">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  aria-label={`Rate ${n} out of 5`}
+                  onClick={() => setRating(n === rating ? 0 : n)}
+                  className="p-0.5"
+                >
+                  <Star
+                    className={cn(
+                      "size-4",
+                      n <= rating ? "fill-primary text-primary" : "text-muted-foreground",
+                    )}
+                  />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <label htmlFor="fb-message" className="text-xs font-semibold text-muted-foreground">
+        <div className="space-y-1">
+          <label htmlFor="fb-message" className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             Message
           </label>
           <textarea
@@ -160,27 +165,26 @@ export function FeedbackForm({ className }: { className?: string }) {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             maxLength={1000}
-            rows={4}
-            placeholder="tell us what's good and what's not…"
-            className="w-full rounded-2xl border border-border bg-secondary/40 px-4 py-3 text-sm outline-none focus:border-primary"
+            rows={3}
+            placeholder="what's good / what's not…"
+            className="w-full rounded-xl border border-border bg-secondary/40 px-3 py-2 text-sm outline-none focus:border-primary"
           />
         </div>
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p className="text-xs text-destructive">{error}</p>}
 
         <Button
           type="submit"
-          size="lg"
           disabled={busy}
-          className="h-13 w-full rounded-2xl py-3 text-base font-bold"
+          className="h-11 w-full rounded-xl text-sm font-bold"
         >
           {busy ? (
             <>
-              <Loader2 className="mr-2 size-5 animate-spin" /> Sending…
+              <Loader2 className="mr-2 size-4 animate-spin" /> Sending…
             </>
           ) : (
             <>
-              <Send className="mr-2 size-5" /> Send it
+              <Send className="mr-2 size-4" /> Send it
             </>
           )}
         </Button>
