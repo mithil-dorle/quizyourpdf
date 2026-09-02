@@ -239,7 +239,7 @@ function StudyGuideGeneratorPage() {
                     id="days"
                     type="number"
                     min={1}
-                    max={120}
+                    max={365}
                     value={daysInput}
                     onChange={(e) => {
                       const raw = e.target.value;
