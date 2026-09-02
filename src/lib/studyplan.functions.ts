@@ -33,7 +33,7 @@ export type StudyPlan = z.infer<typeof PlanSchema>;
 
 const Input = z.object({
   exam: z.string().min(1).max(120),
-  days: z.number().min(1).max(120),
+  days: z.number().min(1),
   hoursPerDay: z.number().min(1).max(18),
   level: z.string(),
   syllabus: z.string().min(20),
