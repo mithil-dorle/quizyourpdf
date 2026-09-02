@@ -90,6 +90,7 @@ const PRIORITY_STYLE: Record<string, string> = {
 function StudyGuideGeneratorPage() {
   const [exam, setExam] = useState("");
   const [days, setDays] = useState(14);
+  const [daysInput, setDaysInput] = useState(String(days));
   const [hours, setHours] = useState(3);
   const [level, setLevel] = useState(LEVELS[1]!.id);
   const [syllabus, setSyllabus] = useState("");
@@ -108,6 +109,14 @@ function StudyGuideGeneratorPage() {
     const id = setInterval(() => setCopyIndex((i) => (i + 1) % LOADING_COPY.length), 1800);
     return () => clearInterval(id);
   }, [loading]);
+
+  const clampDays = (n: number) => Math.max(1, Math.min(120, Number.isNaN(n) ? 1 : n));
+
+  const commitDays = (raw: string) => {
+    const n = clampDays(Number(raw));
+    setDays(n);
+    setDaysInput(String(n));
+  };
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
@@ -231,8 +240,14 @@ function StudyGuideGeneratorPage() {
                     type="number"
                     min={1}
                     max={120}
-                    value={days}
-                    onChange={(e) => setDays(Math.max(1, Math.min(120, Number(e.target.value) || 1)))}
+                    value={daysInput}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      setDaysInput(raw);
+                      const n = Number(raw);
+                      if (!Number.isNaN(n) && raw !== "") setDays(clampDays(n));
+                    }}
+                    onBlur={() => commitDays(daysInput)}
                     className="w-full rounded-xl border border-input bg-background/40 px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
                   />
                 </div>
@@ -244,7 +259,7 @@ function StudyGuideGeneratorPage() {
                     id="hours"
                     type="range"
                     min={1}
-                    max={12}
+                    max={18}
                     value={hours}
                     aria-label="Hours available to study per day"
                     onChange={(e) => setHours(Number(e.target.value))}

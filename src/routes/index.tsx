@@ -551,8 +551,8 @@ const TESTIMONIALS = [
     role: "High school senior",
     avatar: "PK",
     color: "bg-secondary text-secondary-foreground",
-    stars: 4,
-    quote: "Way better than Quizlet. It reads the whole PDF and the questions actually match what I studied. 10/10 would cram again.",
+    stars: 5,
+    quote: "I actually look forward to reviewing now. The questions feel like they came straight from my own notes — because they did.",
   },
 ];
 
