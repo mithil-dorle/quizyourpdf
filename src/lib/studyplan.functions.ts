@@ -77,7 +77,7 @@ ${source}
     const result = streamText({
       model: gateway("google/gemini-3-flash-preview"),
       prompt,
-      maxOutputTokens: 8000,
+      maxOutputTokens: 32000,
     });
     const raw = await result.text;
     const cleaned = raw
@@ -86,16 +86,57 @@ ${source}
       .replace(/```$/, "")
       .trim();
 
+    const candidate = cleaned.startsWith("{") ? cleaned : (cleaned.match(/\{[\s\S]*/)?.[0] ?? "");
+
     let parsed: unknown;
     try {
-      parsed = JSON.parse(cleaned);
+      parsed = JSON.parse(candidate);
     } catch {
-      const match = cleaned.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error("The AI couldn't shape a plan from this syllabus. Try again.");
-      parsed = JSON.parse(match[0]);
+      const repaired = repairTruncatedJson(candidate);
+      if (!repaired) throw new Error("The AI couldn't shape a plan from this syllabus. Try again.");
+      parsed = repaired;
     }
+
 
     const plan = PlanSchema.parse(parsed);
     if (!plan.days.length) throw new Error("The AI couldn't shape a plan. Try again.");
     return plan;
   });
+
+// Model output can get cut off mid-object when it hits the token cap.
+// Walk back to the last valid prefix and close the open brackets/strings.
+function repairTruncatedJson(text: string): unknown {
+  if (!text) return null;
+  for (let end = text.length; end > 1; end--) {
+    const slice = text.slice(0, end);
+    const closed = closeOpenStructures(slice);
+    if (!closed) continue;
+    try {
+      return JSON.parse(closed);
+    } catch {
+      // keep trimming
+    }
+  }
+  return null;
+}
+
+function closeOpenStructures(slice: string): string | null {
+  const stack: string[] = [];
+  let inString = false;
+  let escaped = false;
+  for (const ch of slice) {
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === "\\") escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    else if (ch === "{" || ch === "[") stack.push(ch);
+    else if (ch === "}" || ch === "]") stack.pop();
+  }
+  if (inString || escaped) return null;
+  let out = slice.replace(/,\s*$/, "");
+  for (let i = stack.length - 1; i >= 0; i--) out += stack[i] === "{" ? "}" : "]";
+  return out;
+}
