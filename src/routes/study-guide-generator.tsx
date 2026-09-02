@@ -110,7 +110,7 @@ function StudyGuideGeneratorPage() {
     return () => clearInterval(id);
   }, [loading]);
 
-  const clampDays = (n: number) => Math.max(1, Math.min(120, Number.isNaN(n) ? 1 : n));
+  const clampDays = (n: number) => Math.max(1, Number.isNaN(n) ? 1 : n);
 
   const commitDays = (raw: string) => {
     const n = clampDays(Number(raw));
@@ -239,7 +239,6 @@ function StudyGuideGeneratorPage() {
                     id="days"
                     type="number"
                     min={1}
-                    max={120}
                     value={daysInput}
                     onChange={(e) => {
                       const raw = e.target.value;
