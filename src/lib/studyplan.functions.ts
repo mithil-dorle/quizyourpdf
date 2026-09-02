@@ -77,7 +77,7 @@ ${source}
     const result = streamText({
       model: gateway("google/gemini-3-flash-preview"),
       prompt,
-      maxOutputTokens: 8000,
+      maxOutputTokens: 32000,
     });
     const raw = await result.text;
     const cleaned = raw
@@ -86,14 +86,17 @@ ${source}
       .replace(/```$/, "")
       .trim();
 
+    const candidate = cleaned.startsWith("{") ? cleaned : (cleaned.match(/\{[\s\S]*/)?.[0] ?? "");
+
     let parsed: unknown;
     try {
-      parsed = JSON.parse(cleaned);
+      parsed = JSON.parse(candidate);
     } catch {
-      const match = cleaned.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error("The AI couldn't shape a plan from this syllabus. Try again.");
-      parsed = JSON.parse(match[0]);
+      const repaired = repairTruncatedJson(candidate);
+      if (!repaired) throw new Error("The AI couldn't shape a plan from this syllabus. Try again.");
+      parsed = repaired;
     }
+
 
     const plan = PlanSchema.parse(parsed);
     if (!plan.days.length) throw new Error("The AI couldn't shape a plan. Try again.");
