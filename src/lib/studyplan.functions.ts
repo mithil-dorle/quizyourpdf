@@ -51,7 +51,7 @@ const PRIORITY: Record<string, "high" | "medium" | "low"> = {
 type CompactItem = [string, string, number, string?];
 type CompactSlot = { n?: string; i?: CompactItem[] };
 type CompactDay = { d?: number; f?: string; s?: CompactSlot[] };
-type CompactPlan = { title?: string; strategy?: string[]; days?: CompactDay[] };
+type CompactPlan = { title?: string | undefined; strategy?: string[] | undefined; days?: CompactDay[] | undefined };
 
 // The model replies in a compact shape (short keys, item tuples) so it emits
 // far fewer tokens — expand it back into the full plan shape here.
