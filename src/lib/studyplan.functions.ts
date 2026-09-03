@@ -75,6 +75,8 @@ function expand(raw: CompactPlan): unknown {
   };
 }
 
+const CHUNK = 7;
+
 export const generateStudyPlan = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => Input.parse(input))
   .handler(async ({ data }) => {
@@ -88,56 +90,83 @@ export const generateStudyPlan = createServerFn({ method: "POST" })
     const slots = Math.min(4, Math.max(1, Math.round(data.hoursPerDay / 1.5)));
     const source = data.syllabus.slice(0, 12000);
 
-    const prompt = `You are an expert exam coach. Build a day-by-day study schedule.
+    const ranges: Array<[number, number]> = [];
+    for (let s = 1; s <= planDays; s += CHUNK) ranges.push([s, Math.min(planDays, s + CHUNK - 1)]);
+
+    // Each chunk of days is generated in parallel, so a 30-day plan takes about
+    // as long as a 7-day one.
+    async function chunk(from: number, to: number, withMeta: boolean): Promise<CompactPlan> {
+      const phase =
+        from > planDays * 0.85
+          ? "final stretch: revision, mock papers and weak-spot repair"
+          : from === 1
+            ? "foundations first, highest-yield topics early"
+            : "build on earlier days and revisit them with spaced repetition";
+
+      const prompt = `You are an expert exam coach building part of a day-by-day study schedule.
 
 Exam: ${data.exam}
-Days until exam: ${data.days} (schedule the first ${planDays} days)
-Hours available per day: ${data.hoursPerDay}
+Total days until exam: ${data.days} (full plan covers days 1-${planDays})
+You write ONLY days ${from} to ${to}. Phase: ${phase}.
+Hours per day: ${data.hoursPerDay}
 Student level: ${data.level}
 
-Reply with ONLY raw minified JSON (no markdown, no spaces) in exactly this shape:
-{"title":"short title","strategy":["3 short tips"],"days":[{"d":1,"f":"theme","s":[{"n":"Slot 1","i":[["topic","h",60,"what to do"]]}]}]}
+Reply with ONLY raw minified JSON (no markdown, no spaces):
+{${withMeta ? '"title":"short title","strategy":["3 short punchy tips"],' : ""}"days":[{"d":${from},"f":"theme","s":[{"n":"Slot 1","i":[["topic","h",60,"what to do"]]}]}]}
 
 Item tuple = [topic, priority, minutes, note]. priority is "h" (high-yield), "m" or "l".
 
 Rules:
-- Exactly ${planDays} day objects, d = 1..${planDays}.
+- Exactly ${to - from + 1} day objects, d = ${from}..${to}.
 - ${slots} slots per day, total ${data.hoursPerDay * 60} minutes per day, 1-2 items per slot.
-- Spaced repetition: revisit earlier topics later; last 15% of days = revision + mocks.
-- Only topics from the syllabus. Notes under 8 words. No repeated filler text.
+- Only topics from the syllabus. Notes under 8 words. No filler.
 
 SYLLABUS:
 """
 ${source}
 """`;
 
-    const result = streamText({
-      model: gateway("google/gemini-3.7-flash"),
-      prompt,
-      maxOutputTokens: 16000,
-      providerOptions: { lovable: { service_tier: "priority" } },
-    });
-    const raw = await result.text;
-    const cleaned = raw
-      .trim()
-      .replace(/^```(?:json)?/i, "")
-      .replace(/```$/, "")
-      .trim();
-
-    const candidate = cleaned.startsWith("{") ? cleaned : (cleaned.match(/\{[\s\S]*/)?.[0] ?? "");
-
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(candidate);
-    } catch {
-      const repaired = repairTruncatedJson(candidate);
-      if (!repaired) throw new Error("The AI couldn't shape a plan from this syllabus. Try again.");
-      parsed = repaired;
+      const result = streamText({
+        model: gateway("google/gemini-3.7-flash"),
+        prompt,
+        maxOutputTokens: 6000,
+        providerOptions: { lovable: { service_tier: "priority" } },
+      });
+      return parsePlanJson(await result.text);
     }
 
-    const plan = PlanSchema.parse(expand(parsed as CompactPlan));
+    const parts = await Promise.all(ranges.map(([f, t], i) => chunk(f, t, i === 0)));
+
+    const merged: CompactPlan = {
+      title: parts[0]?.title,
+      strategy: parts[0]?.strategy,
+      days: parts
+        .flatMap((p) => p.days ?? [])
+        .sort((a, b) => (a.d ?? 0) - (b.d ?? 0))
+        .slice(0, planDays),
+    };
+
+    const plan = PlanSchema.parse(expand(merged));
     if (!plan.days.length) throw new Error("The AI couldn't shape a plan. Try again.");
     return plan;
+  });
+
+function parsePlanJson(raw: string): CompactPlan {
+  const cleaned = raw
+    .trim()
+    .replace(/^```(?:json)?/i, "")
+    .replace(/```$/, "")
+    .trim();
+  const candidate = cleaned.startsWith("{") ? cleaned : (cleaned.match(/\{[\s\S]*/)?.[0] ?? "");
+  try {
+    return JSON.parse(candidate) as CompactPlan;
+  } catch {
+    const repaired = repairTruncatedJson(candidate);
+    if (!repaired) throw new Error("The AI couldn't shape a plan from this syllabus. Try again.");
+    return repaired as CompactPlan;
+  }
+}
+
   });
 
 // Model output can get cut off mid-object when it hits the token cap.
