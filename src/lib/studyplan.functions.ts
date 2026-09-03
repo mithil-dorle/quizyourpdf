@@ -167,7 +167,7 @@ function parsePlanJson(raw: string): CompactPlan {
   }
 }
 
-  });
+
 
 // Model output can get cut off mid-object when it hits the token cap.
 // Only retry at plausible cut points (after a closing bracket) so repair stays fast.
