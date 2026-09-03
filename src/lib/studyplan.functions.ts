@@ -39,6 +39,44 @@ const Input = z.object({
   syllabus: z.string().min(20),
 });
 
+const PRIORITY: Record<string, "high" | "medium" | "low"> = {
+  h: "high",
+  m: "medium",
+  l: "low",
+  high: "high",
+  medium: "medium",
+  low: "low",
+};
+
+type CompactItem = [string, string, number, string?];
+type CompactSlot = { n?: string; i?: CompactItem[] };
+type CompactDay = { d?: number; f?: string; s?: CompactSlot[] };
+type CompactPlan = { title?: string | undefined; strategy?: string[] | undefined; days?: CompactDay[] | undefined };
+
+// The model replies in a compact shape (short keys, item tuples) so it emits
+// far fewer tokens — expand it back into the full plan shape here.
+function expand(raw: CompactPlan): unknown {
+  return {
+    title: raw.title,
+    strategy: raw.strategy,
+    days: (raw.days ?? []).map((d, di) => ({
+      day: d.d ?? di + 1,
+      focus: d.f ?? "",
+      slots: (d.s ?? []).map((s, si) => ({
+        slot: s.n ?? `Slot ${si + 1}`,
+        items: (s.i ?? []).map((it) => ({
+          topic: it[0] ?? "",
+          priority: PRIORITY[String(it[1] ?? "m").toLowerCase()] ?? "medium",
+          minutes: Number(it[2]) || 45,
+          note: it[3] ?? "",
+        })),
+      })),
+    })),
+  };
+}
+
+const CHUNK = 7;
+
 export const generateStudyPlan = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => Input.parse(input))
   .handler(async ({ data }) => {
@@ -49,67 +87,99 @@ export const generateStudyPlan = createServerFn({ method: "POST" })
     const gateway = createLovableAiGatewayProvider(key);
 
     const planDays = Math.min(data.days, 30);
-    const source = data.syllabus.slice(0, 40000);
+    const slots = Math.min(4, Math.max(1, Math.round(data.hoursPerDay / 1.5)));
+    const source = data.syllabus.slice(0, 12000);
 
-    const prompt = `You are an expert exam coach. Build a day-by-day study schedule.
+    const ranges: Array<[number, number]> = [];
+    for (let s = 1; s <= planDays; s += CHUNK) ranges.push([s, Math.min(planDays, s + CHUNK - 1)]);
+
+    // Each chunk of days is generated in parallel, so a 30-day plan takes about
+    // as long as a 7-day one.
+    async function chunk(from: number, to: number, withMeta: boolean): Promise<CompactPlan> {
+      const phase =
+        from > planDays * 0.85
+          ? "final stretch: revision, mock papers and weak-spot repair"
+          : from === 1
+            ? "foundations first, highest-yield topics early"
+            : "build on earlier days and revisit them with spaced repetition";
+
+      const prompt = `You are an expert exam coach building part of a day-by-day study schedule.
 
 Exam: ${data.exam}
-Days until exam: ${data.days} (schedule the first ${planDays} days in detail)
-Hours available per day: ${data.hoursPerDay}
+Total days until exam: ${data.days} (full plan covers days 1-${planDays})
+You write ONLY days ${from} to ${to}. Phase: ${phase}.
+Hours per day: ${data.hoursPerDay}
 Student level: ${data.level}
 
-Reply with ONLY raw JSON (no markdown fences) in exactly this shape:
-{"title":"short plan title","strategy":["3-5 short punchy tips"],"days":[{"day":1,"focus":"short theme","slots":[{"slot":"Slot 1 · 60 min","items":[{"topic":"topic name","priority":"high|medium|low","minutes":60,"note":"one short line on what to do"}]}]}]}
+Reply with ONLY raw minified JSON (no markdown, no spaces):
+{${withMeta ? '"title":"short title","strategy":["3 short punchy tips"],' : ""}"days":[{"d":${from},"f":"theme","s":[{"n":"Slot 1","i":[["topic","h",60,"what to do"]]}]}]}
+
+Item tuple = [topic, priority, minutes, note]. priority is "h" (high-yield), "m" or "l".
+${withMeta ? `The title and strategy describe the WHOLE ${planDays}-day plan for ${data.exam}, never just these days.` : ""}
 
 Rules:
-- Exactly ${planDays} day objects, day numbers 1..${planDays}.
-- Total minutes per day must be about ${data.hoursPerDay * 60} minutes, split into ${Math.max(1, Math.round(data.hoursPerDay))} slots.
-- priority: high = high-yield/crucial, medium = normal, low = quick read.
-- Use spaced repetition: revisit earlier topics later, and reserve the last 15% of days for revision + mock practice.
-- Only use topics from the syllabus below.
-- Keep notes under 12 words.
+- Exactly ${to - from + 1} day objects, d = ${from}..${to}.
+- ${slots} slots per day, total ${data.hoursPerDay * 60} minutes per day, 1-2 items per slot.
+- Only topics from the syllabus. Notes under 8 words. No filler.
 
 SYLLABUS:
 """
 ${source}
 """`;
 
-    const result = streamText({
-      model: gateway("google/gemini-3-flash-preview"),
-      prompt,
-      maxOutputTokens: 32000,
-    });
-    const raw = await result.text;
-    const cleaned = raw
-      .trim()
-      .replace(/^```(?:json)?/i, "")
-      .replace(/```$/, "")
-      .trim();
-
-    const candidate = cleaned.startsWith("{") ? cleaned : (cleaned.match(/\{[\s\S]*/)?.[0] ?? "");
-
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(candidate);
-    } catch {
-      const repaired = repairTruncatedJson(candidate);
-      if (!repaired) throw new Error("The AI couldn't shape a plan from this syllabus. Try again.");
-      parsed = repaired;
+      const result = streamText({
+        model: gateway("google/gemini-3.7-flash"),
+        prompt,
+        maxOutputTokens: 6000,
+        providerOptions: { lovable: { service_tier: "priority" } },
+      });
+      return parsePlanJson(await result.text);
     }
 
+    const parts = await Promise.all(ranges.map(([f, t], i) => chunk(f, t, i === 0)));
 
-    const plan = PlanSchema.parse(parsed);
+    const merged: CompactPlan = {
+      title: parts[0]?.title,
+      strategy: parts[0]?.strategy,
+      days: parts
+        .flatMap((p) => p.days ?? [])
+        .sort((a, b) => (a.d ?? 0) - (b.d ?? 0))
+        .slice(0, planDays),
+    };
+
+    const plan = PlanSchema.parse(expand(merged));
     if (!plan.days.length) throw new Error("The AI couldn't shape a plan. Try again.");
     return plan;
   });
 
+function parsePlanJson(raw: string): CompactPlan {
+  const cleaned = raw
+    .trim()
+    .replace(/^```(?:json)?/i, "")
+    .replace(/```$/, "")
+    .trim();
+  const candidate = cleaned.startsWith("{") ? cleaned : (cleaned.match(/\{[\s\S]*/)?.[0] ?? "");
+  try {
+    return JSON.parse(candidate) as CompactPlan;
+  } catch {
+    const repaired = repairTruncatedJson(candidate);
+    if (!repaired) throw new Error("The AI couldn't shape a plan from this syllabus. Try again.");
+    return repaired as CompactPlan;
+  }
+}
+
+
+
 // Model output can get cut off mid-object when it hits the token cap.
-// Walk back to the last valid prefix and close the open brackets/strings.
+// Only retry at plausible cut points (after a closing bracket) so repair stays fast.
 function repairTruncatedJson(text: string): unknown {
   if (!text) return null;
-  for (let end = text.length; end > 1; end--) {
-    const slice = text.slice(0, end);
-    const closed = closeOpenStructures(slice);
+  let tries = 0;
+  for (let end = text.length; end > 1 && tries < 400; end--) {
+    const ch = text[end - 1];
+    if (ch !== "}" && ch !== "]") continue;
+    tries++;
+    const closed = closeOpenStructures(text.slice(0, end));
     if (!closed) continue;
     try {
       return JSON.parse(closed);
@@ -119,6 +189,7 @@ function repairTruncatedJson(text: string): unknown {
   }
   return null;
 }
+
 
 function closeOpenStructures(slice: string): string | null {
   const stack: string[] = [];
