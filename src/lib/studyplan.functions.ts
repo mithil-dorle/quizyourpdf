@@ -115,6 +115,7 @@ Reply with ONLY raw minified JSON (no markdown, no spaces):
 {${withMeta ? '"title":"short title","strategy":["3 short punchy tips"],' : ""}"days":[{"d":${from},"f":"theme","s":[{"n":"Slot 1","i":[["topic","h",60,"what to do"]]}]}]}
 
 Item tuple = [topic, priority, minutes, note]. priority is "h" (high-yield), "m" or "l".
+${withMeta ? `The title and strategy describe the WHOLE ${planDays}-day plan for ${data.exam}, never just these days.` : ""}
 
 Rules:
 - Exactly ${to - from + 1} day objects, d = ${from}..${to}.
