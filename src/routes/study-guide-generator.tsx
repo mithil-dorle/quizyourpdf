@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   CalendarDays,
@@ -7,6 +7,7 @@ import {
   Clock,
   Download,
   FileUp,
+  Flag,
   Loader2,
   RotateCcw,
   Sparkles,
@@ -17,9 +18,9 @@ import { extractPdfText } from "@/lib/pdf";
 import { generateStudyPlan, type StudyPlan } from "@/lib/studyplan.functions";
 import { downloadStudyPlanPdf } from "@/lib/studyplan-pdf";
 
-const TITLE = "Study Guide Generator — AI Study Schedule You Can Download";
+const TITLE = "Study Guide Generator — Weekly AI Study Timetable You Can Download";
 const DESCRIPTION =
-  "Free AI study guide generator: paste your syllabus or drop a PDF and get a day-by-day, colour-coded study schedule with revision checkboxes you can download as a PDF.";
+  "Free AI study guide generator: paste your syllabus or drop a PDF and get a week-by-week study timetable with topics to cover, colour-coded priorities and revision checkboxes you can download as a PDF.";
 const URL = "https://quizyourpdf.com/study-guide-generator";
 
 const LEVELS = [
@@ -31,23 +32,23 @@ const LEVELS = [
 const LOADING_COPY = [
   "Analyzing syllabus...",
   "Ranking high-yield topics...",
-  "Calculating optimal time slots...",
+  "Splitting it week by week...",
   "Applying spaced repetition...",
-  "Locking in your plan...",
+  "Locking in your timetable...",
 ];
 
 const faqs = [
   {
     q: "Is this study guide generator free?",
-    a: "Yes. Paste a syllabus or drop a PDF and download your study plan without creating an account.",
+    a: "Yes. Paste a syllabus or drop a PDF and download your weekly study plan without creating an account.",
   },
   {
     q: "What does the downloadable PDF include?",
-    a: "A header with your exam name, countdown and total study hours, a day-by-day table split into time slots, colour-coded topic priorities, and three revision checkboxes next to every topic.",
+    a: "A header with your exam name, weeks left and total study hours, a topics-to-cover list for every week, a week-by-week timetable split by day, colour-coded topic priorities, and three revision checkboxes next to every topic.",
   },
   {
-    q: "How is this different from a summary tool?",
-    a: "It doesn't just summarise. It builds a schedule: what to study on which day, in which slot, with spaced-repetition revision built in.",
+    q: "Why weeks instead of days?",
+    a: "Weeks match how syllabuses are actually chunked. You get weekly topic targets and a milestone, then a day-level timetable inside each week — so a missed day doesn't wreck the whole plan.",
   },
 ];
 
@@ -89,9 +90,10 @@ const PRIORITY_STYLE: Record<string, string> = {
 
 function StudyGuideGeneratorPage() {
   const [exam, setExam] = useState("");
-  const [days, setDays] = useState(14);
-  const [daysInput, setDaysInput] = useState(String(days));
+  const [weeks, setWeeks] = useState(4);
+  const [weeksInput, setWeeksInput] = useState("4");
   const [hours, setHours] = useState(3);
+  const [studyDays, setStudyDays] = useState(6);
   const [level, setLevel] = useState(LEVELS[1]!.id);
   const [syllabus, setSyllabus] = useState("");
   const [fileName, setFileName] = useState("");
@@ -110,12 +112,15 @@ function StudyGuideGeneratorPage() {
     return () => clearInterval(id);
   }, [loading]);
 
-  const clampDays = (n: number) => Math.max(1, Number.isNaN(n) ? 1 : n);
+  const daysLeft = weeks * 7;
+  const totalHours = weeks * studyDays * hours;
 
-  const commitDays = (raw: string) => {
-    const n = clampDays(Number(raw));
-    setDays(n);
-    setDaysInput(String(n));
+  const clampWeeks = (n: number) => Math.max(1, Number.isNaN(n) ? 1 : Math.floor(n));
+
+  const commitWeeks = (raw: string) => {
+    const n = clampWeeks(Number(raw));
+    setWeeks(n);
+    setWeeksInput(String(n));
   };
 
   async function handleFile(file: File | undefined) {
@@ -152,7 +157,14 @@ function StudyGuideGeneratorPage() {
     setLoading(true);
     try {
       const result = await generateStudyPlan({
-        data: { exam: exam.trim(), days, hoursPerDay: hours, level, syllabus },
+        data: {
+          exam: exam.trim(),
+          weeks,
+          hoursPerDay: hours,
+          studyDaysPerWeek: studyDays,
+          level,
+          syllabus,
+        },
       });
       setPlan(result);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -185,8 +197,9 @@ function StudyGuideGeneratorPage() {
         <PlanView
           plan={plan}
           exam={exam}
-          days={days}
+          weeks={weeks}
           hours={hours}
+          studyDays={studyDays}
           onReset={() => setPlan(null)}
         />
       ) : (
@@ -201,8 +214,8 @@ function StudyGuideGeneratorPage() {
             </h1>
             <p className="mx-auto max-w-lg text-sm text-muted-foreground sm:text-base">
               Tell it your exam, your syllabus and how many hours you actually have. Get a
-              day-by-day plan with colour-coded priorities and revision checkboxes — downloadable
-              as a PDF.
+              week-by-week timetable with topics to cover, colour-coded priorities and revision
+              checkboxes — downloadable as a PDF.
             </p>
           </section>
 
@@ -211,7 +224,7 @@ function StudyGuideGeneratorPage() {
               <Loader2 className="size-8 animate-spin text-primary" />
               <p className="font-display text-lg font-bold">{LOADING_COPY[copyIndex]}</p>
               <p className="text-xs text-muted-foreground">
-                building {Math.min(days, 30)} days · {hours}h/day · locked to your syllabus
+                building {Math.min(weeks, 16)} weeks · {studyDays} days/week · {hours}h/day
               </p>
             </div>
           ) : (
@@ -232,23 +245,26 @@ function StudyGuideGeneratorPage() {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label htmlFor="days" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    <CalendarDays className="size-3.5" /> days left
+                  <label htmlFor="weeks" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    <CalendarDays className="size-3.5" /> weeks left
                   </label>
                   <input
-                    id="days"
+                    id="weeks"
                     type="number"
                     min={1}
-                    value={daysInput}
+                    value={weeksInput}
                     onChange={(e) => {
                       const raw = e.target.value;
-                      setDaysInput(raw);
+                      setWeeksInput(raw);
                       const n = Number(raw);
-                      if (!Number.isNaN(n) && raw !== "") setDays(clampDays(n));
+                      if (!Number.isNaN(n) && raw !== "") setWeeks(clampWeeks(n));
                     }}
-                    onBlur={() => commitDays(daysInput)}
+                    onBlur={() => commitWeeks(weeksInput)}
                     className="w-full rounded-xl border border-input bg-background/40 px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
                   />
+                  <p className="text-[11px] text-muted-foreground">
+                    = <span className="text-primary">{daysLeft} days</span> left
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="hours" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -264,6 +280,31 @@ function StudyGuideGeneratorPage() {
                     onChange={(e) => setHours(Number(e.target.value))}
                     className="w-full accent-[var(--primary)]"
                   />
+                  <p className="text-[11px] text-muted-foreground">
+                    total: <span className="text-primary">{totalHours}h</span> of study
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  <CalendarDays className="size-3.5" /> study days per week
+                </span>
+                <div className="grid grid-cols-7 gap-1.5">
+                  {[1, 2, 3, 4, 5, 6, 7].map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => setStudyDays(d)}
+                      className={`rounded-xl border py-2 text-xs font-bold transition-colors ${
+                        studyDays === d
+                          ? "border-primary bg-primary/15 text-primary"
+                          : "border-border text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {d}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -389,27 +430,38 @@ function StudyGuideGeneratorPage() {
 function PlanView({
   plan,
   exam,
-  days,
+  weeks,
   hours,
+  studyDays,
   onReset,
 }: {
   plan: StudyPlan;
   exam: string;
-  days: number;
+  weeks: number;
   hours: number;
+  studyDays: number;
   onReset: () => void;
 }) {
   const [downloading, setDownloading] = useState(false);
-  const totalHours = plan.days.length * hours;
+  const [done, setDone] = useState<Record<string, boolean>>({});
+  const totalHours = plan.weeks.length * studyDays * hours;
+
+  const totalTopics = useMemo(
+    () => plan.weeks.reduce((n, w) => n + w.topics.length, 0),
+    [plan],
+  );
+  const doneCount = Object.values(done).filter(Boolean).length;
+  const progress = totalTopics ? Math.round((doneCount / totalTopics) * 100) : 0;
 
   return (
     <div className="space-y-6">
       <section className="surface-card glow-lime space-y-4 p-5 sm:p-6">
         <h1 className="font-display text-2xl font-bold sm:text-3xl">{plan.title}</h1>
-        <div className="grid grid-cols-3 gap-2 text-center">
+        <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
           {[
             { label: "exam", value: exam },
-            { label: "days left", value: String(days) },
+            { label: "weeks left", value: String(weeks) },
+            { label: "days left", value: String(weeks * 7) },
             { label: "total hours", value: `${totalHours}h` },
           ].map((s) => (
             <div key={s.label} className="rounded-xl border border-border p-3">
@@ -420,6 +472,19 @@ function PlanView({
             </div>
           ))}
         </div>
+
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <span>topics ticked off</span>
+            <span className="text-primary">
+              {doneCount}/{totalTopics} · {progress}%
+            </span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+
         <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="button"
@@ -427,7 +492,13 @@ function PlanView({
             onClick={async () => {
               setDownloading(true);
               try {
-                await downloadStudyPlanPdf({ plan, exam, days, hoursPerDay: hours });
+                await downloadStudyPlanPdf({
+                  plan,
+                  exam,
+                  weeks,
+                  hoursPerDay: hours,
+                  studyDaysPerWeek: studyDays,
+                });
               } finally {
                 setDownloading(false);
               }
@@ -474,50 +545,114 @@ function PlanView({
         </span>
       </div>
 
-      <section className="space-y-3">
-        {plan.days.map((day) => (
-          <div key={day.day} className="surface-card space-y-3 p-5">
-            <div className="flex items-baseline justify-between gap-3">
-              <h3 className="font-display text-lg font-bold">Day {day.day}</h3>
-              <span className="truncate text-xs text-muted-foreground">{day.focus}</span>
-            </div>
-            <div className="space-y-3">
-              {day.slots.map((slot, si) => (
-                <div key={`${day.day}-${si}`} className="space-y-2">
+      <section className="space-y-4">
+        {plan.weeks.map((week) => {
+          const weekMinutes = week.days.reduce(
+            (m, d) => m + d.items.reduce((s, i) => s + i.minutes, 0),
+            0,
+          );
+          return (
+            <div key={week.week} className="surface-card space-y-4 p-5">
+              <div className="flex items-baseline justify-between gap-3">
+                <h3 className="font-display text-lg font-bold">Week {week.week}</h3>
+                <span className="truncate text-xs text-muted-foreground">
+                  {week.theme} · {Math.round(weekMinutes / 60)}h
+                </span>
+              </div>
+
+              {week.topics.length > 0 && (
+                <div className="space-y-2 rounded-xl border border-border/70 bg-background/30 p-3">
                   <div className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                    {slot.slot}
+                    topics to cover this week
                   </div>
-                  {slot.items.map((item, ii) => (
-                    <div
-                      key={`${day.day}-${si}-${ii}`}
-                      className="flex flex-wrap items-center gap-2 rounded-xl border border-border px-3 py-2.5"
-                    >
-                      <span
-                        className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${
-                          PRIORITY_STYLE[item.priority] ?? PRIORITY_STYLE["medium"]
-                        }`}
+                  {week.topics.map((t, ti) => {
+                    const id = `${week.week}-${ti}`;
+                    return (
+                      <label
+                        key={id}
+                        className="flex cursor-pointer flex-wrap items-center gap-2 text-sm"
                       >
-                        {item.priority}
-                      </span>
-                      <span className="min-w-0 flex-1 text-sm font-medium">
-                        {item.topic}
-                        {item.note && (
-                          <span className="block text-xs text-muted-foreground">{item.note}</span>
-                        )}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{item.minutes}m</span>
-                      <span className="flex items-center gap-1 text-muted-foreground/60">
-                        <CheckSquare className="size-3.5" />
-                        <CheckSquare className="size-3.5" />
-                        <CheckSquare className="size-3.5" />
-                      </span>
-                    </div>
-                  ))}
+                        <input
+                          type="checkbox"
+                          checked={!!done[id]}
+                          onChange={(e) => setDone((d) => ({ ...d, [id]: e.target.checked }))}
+                          className="size-4 accent-[var(--primary)]"
+                        />
+                        <span
+                          className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${
+                            PRIORITY_STYLE[t.priority] ?? PRIORITY_STYLE["medium"]
+                          }`}
+                        >
+                          {t.priority}
+                        </span>
+                        <span
+                          className={`min-w-0 flex-1 font-medium ${done[id] ? "text-muted-foreground line-through" : ""}`}
+                        >
+                          {t.topic}
+                          {t.note && (
+                            <span className="block text-xs text-muted-foreground">{t.note}</span>
+                          )}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {Math.round(t.minutes / 60)}h
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
-              ))}
+              )}
+
+              <div className="space-y-3">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  weekly timetable
+                </div>
+                {week.days.map((day, di) => (
+                  <div key={`${week.week}-${di}`} className="space-y-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display text-sm font-bold text-primary">{day.name}</span>
+                      <span className="truncate text-xs text-muted-foreground">{day.focus}</span>
+                    </div>
+                    {day.items.map((item, ii) => (
+                      <div
+                        key={`${week.week}-${di}-${ii}`}
+                        className="flex flex-wrap items-center gap-2 rounded-xl border border-border px-3 py-2.5"
+                      >
+                        <span
+                          className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${
+                            PRIORITY_STYLE[item.priority] ?? PRIORITY_STYLE["medium"]
+                          }`}
+                        >
+                          {item.priority}
+                        </span>
+                        <span className="min-w-0 flex-1 text-sm font-medium">
+                          {item.topic}
+                          {item.note && (
+                            <span className="block text-xs text-muted-foreground">{item.note}</span>
+                          )}
+                        </span>
+                        <span className="text-xs text-muted-foreground">{item.minutes}m</span>
+                        <span className="flex items-center gap-1 text-muted-foreground/60">
+                          <CheckSquare className="size-3.5" />
+                          <CheckSquare className="size-3.5" />
+                          <CheckSquare className="size-3.5" />
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              {week.milestone && (
+                <p className="flex items-start gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2.5 text-sm">
+                  <Flag className="mt-0.5 size-4 shrink-0 text-primary" />
+                  <span>
+                    <span className="font-bold">milestone:</span> {week.milestone}
+                  </span>
+                </p>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
     </div>
   );
