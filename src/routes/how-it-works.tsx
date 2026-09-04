@@ -8,6 +8,9 @@ import {
   Trophy,
   ArrowLeft,
   Zap,
+  CalendarDays,
+  Download,
+  ListChecks,
 } from "lucide-react";
 
 export const Route = createFileRoute("/how-it-works")({
