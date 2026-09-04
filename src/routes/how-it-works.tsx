@@ -70,6 +70,29 @@ const STEPS = [
   },
 ];
 
+const PLAN_STEPS = [
+  {
+    icon: CalendarDays,
+    title: "Set your timeline",
+    body: "Enter your exam name, weeks left, study days per week, and hours per day. The planner calculates your total available study hours automatically.",
+  },
+  {
+    icon: Upload,
+    title: "Drop your syllabus",
+    body: "Paste the syllabus text or upload a PDF of your course outline. The AI pulls out the real topics — no generic filler.",
+  },
+  {
+    icon: ListChecks,
+    title: "Get your weekly plan",
+    body: "Receive a week-by-week schedule with color-coded priority topics, milestones, and a built-in revision tracker for each topic.",
+  },
+  {
+    icon: Download,
+    title: "Download & grind",
+    body: "Export a printable PDF with checkboxes for 1st, 2nd and 3rd revisions next to every topic. Stick it on your wall and start checking boxes.",
+  },
+];
+
 function HowItWorksPage() {
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10">
