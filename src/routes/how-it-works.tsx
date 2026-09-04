@@ -142,6 +142,44 @@ function HowItWorksPage() {
           ))}
         </div>
 
+        <div className="space-y-3 pt-4 text-center">
+          <h2 className="font-display text-3xl font-bold leading-[1.05]">
+            study plan <span className="text-hype">generator</span>
+          </h2>
+          <p className="mx-auto max-w-md text-muted-foreground">
+            Not sure where to start? Let the AI build your whole exam schedule.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {PLAN_STEPS.map((step, i) => (
+            <div
+              key={step.title}
+              className="surface-card space-y-3 p-5 transition-transform hover:-translate-y-0.5"
+            >
+              <div className="flex items-center gap-3">
+                <span className="grid size-9 place-items-center rounded-xl bg-accent/10 text-accent">
+                  <step.icon className="size-5" />
+                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Step {i + 1}
+                </span>
+              </div>
+              <h3 className="font-display text-lg font-bold">{step.title}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center">
+          <Link
+            to="/study-guide-generator"
+            className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Build my study plan
+          </Link>
+        </div>
+
         <div className="surface-card glow-lime space-y-4 p-6 text-center">
           <h2 className="font-display text-xl font-bold">ready to turn studying into a game?</h2>
           <p className="text-sm text-muted-foreground">
