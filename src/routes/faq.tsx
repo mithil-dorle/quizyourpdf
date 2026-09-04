@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Zap, HelpCircle, FileText, Brain, Clock, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowLeft, Zap, HelpCircle, FileText, Brain, Clock, ShieldCheck, Sparkles, CalendarDays, Download } from "lucide-react";
 
 const FAQS = [
   {
@@ -13,6 +13,18 @@ const FAQS = [
     question: "How does the AI generate the quiz?",
     answer:
       "The AI reads your PDF, picks out key concepts, and turns them into multiple-choice questions. You choose the number of questions, difficulty, and time limit before it cooks.",
+  },
+  {
+    icon: CalendarDays,
+    question: "How does the Study Guide Generator work?",
+    answer:
+      "Tell it your exam name, how many weeks you have left, your daily study hours and current level. Paste your syllabus or upload a PDF, and the AI builds a personalized week-by-week study plan with a timetable, milestones and revision tracking.",
+  },
+  {
+    icon: Download,
+    question: "Can I download my study plan as a PDF?",
+    answer:
+      "Yes! Every generated plan has a Download PDF button. The PDF is color-coded by priority (red = high yield, yellow = medium, green = quick read) and includes checkboxes next to each topic so you can tick off revisions after printing.",
   },
   {
     icon: Clock,
@@ -30,13 +42,13 @@ const FAQS = [
     icon: Sparkles,
     question: "Can I use QuizLab for exam prep?",
     answer:
-      "Absolutely. Exam mode hides answers until the end and gives you a full breakdown with topic accuracy, skipped questions, and bulk fact-checking after you submit.",
+      "Absolutely. Exam mode hides answers until the end and gives you a full breakdown with topic accuracy, skipped questions, and bulk fact-checking after you submit. Pair it with the Study Guide Generator for the full exam-prep pipeline.",
   },
   {
     icon: HelpCircle,
     question: "Is my PDF stored anywhere?",
     answer:
-      "Nope. Your PDF is processed in your browser session and not saved on our servers. Quiz data lives locally while you play.",
+      "Nope. Your PDF is processed in your browser session and not saved on our servers. Quiz data and study plans live locally while you work.",
   },
 ];
 

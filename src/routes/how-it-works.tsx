@@ -8,6 +8,9 @@ import {
   Trophy,
   ArrowLeft,
   Zap,
+  CalendarDays,
+  Download,
+  ListChecks,
 } from "lucide-react";
 
 export const Route = createFileRoute("/how-it-works")({
@@ -67,6 +70,29 @@ const STEPS = [
   },
 ];
 
+const PLAN_STEPS = [
+  {
+    icon: CalendarDays,
+    title: "Set your timeline",
+    body: "Enter your exam name, weeks left, study days per week, and hours per day. The planner calculates your total available study hours automatically.",
+  },
+  {
+    icon: Upload,
+    title: "Drop your syllabus",
+    body: "Paste the syllabus text or upload a PDF of your course outline. The AI pulls out the real topics — no generic filler.",
+  },
+  {
+    icon: ListChecks,
+    title: "Get your weekly plan",
+    body: "Receive a week-by-week schedule with color-coded priority topics, milestones, and a built-in revision tracker for each topic.",
+  },
+  {
+    icon: Download,
+    title: "Download & grind",
+    body: "Export a printable PDF with checkboxes for 1st, 2nd and 3rd revisions next to every topic. Stick it on your wall and start checking boxes.",
+  },
+];
+
 function HowItWorksPage() {
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-5 py-10">
@@ -114,6 +140,44 @@ function HowItWorksPage() {
               <p className="text-sm leading-relaxed text-muted-foreground">{step.body}</p>
             </div>
           ))}
+        </div>
+
+        <div className="space-y-3 pt-4 text-center">
+          <h2 className="font-display text-3xl font-bold leading-[1.05]">
+            study plan <span className="text-hype">generator</span>
+          </h2>
+          <p className="mx-auto max-w-md text-muted-foreground">
+            Not sure where to start? Let the AI build your whole exam schedule.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {PLAN_STEPS.map((step, i) => (
+            <div
+              key={step.title}
+              className="surface-card space-y-3 p-5 transition-transform hover:-translate-y-0.5"
+            >
+              <div className="flex items-center gap-3">
+                <span className="grid size-9 place-items-center rounded-xl bg-accent/10 text-accent">
+                  <step.icon className="size-5" />
+                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Step {i + 1}
+                </span>
+              </div>
+              <h3 className="font-display text-lg font-bold">{step.title}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center">
+          <Link
+            to="/study-guide-generator"
+            className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Build my study plan
+          </Link>
         </div>
 
         <div className="surface-card glow-lime space-y-4 p-6 text-center">
