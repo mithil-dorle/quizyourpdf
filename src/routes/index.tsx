@@ -31,6 +31,7 @@ import { extractPdfText } from "@/lib/pdf";
 import { generateQuiz, type Quiz, type QuizQuestion } from "@/lib/quiz.functions";
 import { factCheckQuestion, type FactCheck } from "@/lib/factcheck.functions";
 import { FeedbackForm } from "@/components/FeedbackForm";
+import { ShareDialog } from "@/components/ShareDialog";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -277,12 +278,18 @@ function Index() {
           </span>
           <span className="font-display text-xl font-bold">QuizLab</span>
         </div>
-        <Badge
-          variant="outline"
-          className="hidden rounded-full border-accent/40 text-accent sm:inline-flex"
-        >
-          study, but a game
-        </Badge>
+        <div className="flex items-center gap-2">
+          <ShareDialog
+            url="https://quizyourpdf.com"
+            title="QuizLab — Turn any PDF into a quiz game"
+          />
+          <Badge
+            variant="outline"
+            className="hidden rounded-full border-accent/40 text-accent sm:inline-flex"
+          >
+            study, but a game
+          </Badge>
+        </div>
       </header>
 
       {stage === "upload" && (
