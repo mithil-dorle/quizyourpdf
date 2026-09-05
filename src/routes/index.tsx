@@ -31,6 +31,7 @@ import { extractPdfText } from "@/lib/pdf";
 import { generateQuiz, type Quiz, type QuizQuestion } from "@/lib/quiz.functions";
 import { factCheckQuestion, type FactCheck } from "@/lib/factcheck.functions";
 import { FeedbackForm } from "@/components/FeedbackForm";
+import { ShareButton } from "@/components/ShareButton";
 
 export const Route = createFileRoute("/")({
   head: () => ({

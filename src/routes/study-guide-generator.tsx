@@ -17,6 +17,7 @@ import {
 import { extractPdfText } from "@/lib/pdf";
 import { generateStudyPlan, type StudyPlan } from "@/lib/studyplan.functions";
 import { downloadStudyPlanPdf } from "@/lib/studyplan-pdf";
+import { ShareButton } from "@/components/ShareButton";
 
 const TITLE = "Study Guide Generator — Weekly AI Study Timetable You Can Download";
 const DESCRIPTION =
