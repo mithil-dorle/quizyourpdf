@@ -298,6 +298,13 @@ function Index() {
               Your notes go in, an AI-built quiz comes out — with timers, streaks and
               feedback that actually explains stuff.
             </p>
+            <ShareButton
+              title="QuizLab — PDF to Quiz Generator"
+              text="Turn your PDF notes into a timed AI quiz 🔥"
+              url="https://quizyourpdf.com/"
+              variant="lime"
+              className="mx-auto mt-2"
+            />
           </div>
 
           <div

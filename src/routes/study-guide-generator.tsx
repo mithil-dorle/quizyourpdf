@@ -218,6 +218,13 @@ function StudyGuideGeneratorPage() {
               week-by-week timetable with topics to cover, colour-coded priorities and revision
               checkboxes — downloadable as a PDF.
             </p>
+            <ShareButton
+              title="QuizLab Study Guide Generator"
+              text="I just built my AI study timetable with QuizLab 📚"
+              url="https://quizyourpdf.com/study-guide-generator"
+              variant="lime"
+              className="mx-auto"
+            />
           </section>
 
           {loading ? (
