@@ -1144,6 +1144,13 @@ function Results({
           {score}/{total} correct · {wrong} wrong · {skipped} skipped
           {!exam && ` · best streak ${bestStreak} 🔥`}
         </p>
+        <ShareButton
+          title="I just crushed a QuizLab quiz 🧠"
+          text={`I scored ${pct}% on my QuizLab quiz — can you beat it? 🔥`}
+          url="https://quizyourpdf.com/"
+          variant="pink"
+          className="mx-auto mt-4"
+        />
       </div>
 
       <div className="surface-card space-y-5 p-5 sm:p-6">

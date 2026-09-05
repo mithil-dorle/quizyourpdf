@@ -524,6 +524,13 @@ function PlanView({
             <RotateCcw className="size-4" />
             New plan
           </button>
+          <ShareButton
+            title="My AI study plan from QuizLab"
+            text={`I built a ${weeks}-week study plan for ${exam} with QuizLab 📚`}
+            url="https://quizyourpdf.com/study-guide-generator"
+            variant="pink"
+            className="inline-flex justify-center"
+          />
         </div>
       </section>
 
