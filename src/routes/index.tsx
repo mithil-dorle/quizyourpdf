@@ -31,6 +31,7 @@ import { extractPdfText } from "@/lib/pdf";
 import { generateQuiz, type Quiz, type QuizQuestion } from "@/lib/quiz.functions";
 import { factCheckQuestion, type FactCheck } from "@/lib/factcheck.functions";
 import { FeedbackForm } from "@/components/FeedbackForm";
+import { ShareButton } from "@/components/ShareButton";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -297,6 +298,13 @@ function Index() {
               Your notes go in, an AI-built quiz comes out — with timers, streaks and
               feedback that actually explains stuff.
             </p>
+            <ShareButton
+              title="QuizLab — PDF to Quiz Generator"
+              text="Turn your PDF notes into a timed AI quiz 🔥"
+              url="https://quizyourpdf.com/"
+              variant="lime"
+              className="mx-auto mt-2"
+            />
           </div>
 
           <div
@@ -1136,6 +1144,13 @@ function Results({
           {score}/{total} correct · {wrong} wrong · {skipped} skipped
           {!exam && ` · best streak ${bestStreak} 🔥`}
         </p>
+        <ShareButton
+          title="I just crushed a QuizLab quiz 🧠"
+          text={`I scored ${pct}% on my QuizLab quiz — can you beat it? 🔥`}
+          url="https://quizyourpdf.com/"
+          variant="pink"
+          className="mx-auto mt-4"
+        />
       </div>
 
       <div className="surface-card space-y-5 p-5 sm:p-6">

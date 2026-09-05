@@ -17,6 +17,7 @@ import {
 import { extractPdfText } from "@/lib/pdf";
 import { generateStudyPlan, type StudyPlan } from "@/lib/studyplan.functions";
 import { downloadStudyPlanPdf } from "@/lib/studyplan-pdf";
+import { ShareButton } from "@/components/ShareButton";
 
 const TITLE = "Study Guide Generator — Weekly AI Study Timetable You Can Download";
 const DESCRIPTION =
@@ -217,6 +218,13 @@ function StudyGuideGeneratorPage() {
               week-by-week timetable with topics to cover, colour-coded priorities and revision
               checkboxes — downloadable as a PDF.
             </p>
+            <ShareButton
+              title="QuizLab Study Guide Generator"
+              text="I just built my AI study timetable with QuizLab 📚"
+              url="https://quizyourpdf.com/study-guide-generator"
+              variant="lime"
+              className="mx-auto"
+            />
           </section>
 
           {loading ? (
@@ -516,6 +524,13 @@ function PlanView({
             <RotateCcw className="size-4" />
             New plan
           </button>
+          <ShareButton
+            title="My AI study plan from QuizLab"
+            text={`I built a ${weeks}-week study plan for ${exam} with QuizLab 📚`}
+            url="https://quizyourpdf.com/study-guide-generator"
+            variant="pink"
+            className="inline-flex justify-center"
+          />
         </div>
       </section>
 
