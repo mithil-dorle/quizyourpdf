@@ -177,15 +177,15 @@ function StudyGuideGeneratorPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-3xl px-4 py-8 sm:px-5 sm:py-10">
-      <header className="mb-8 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="grid size-10 place-items-center rounded-2xl bg-primary text-primary-foreground">
-            <Zap className="size-5" />
+    <main className="mx-auto min-h-screen w-full max-w-3xl px-3 py-5 sm:px-5 sm:py-10">
+      <header className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:mb-8 sm:flex sm:justify-between">
+        <Link to="/" className="flex min-w-0 items-center gap-2">
+          <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground sm:size-10 sm:rounded-2xl">
+            <Zap className="size-4 sm:size-5" />
           </span>
-          <span className="font-display text-xl font-bold">QuizLab</span>
+          <span className="truncate font-display text-lg font-bold sm:text-xl">QuizLab</span>
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <ShareDialog
             url="https://quizyourpdf.com/study-guide-generator"
             title="QuizLab — Smart Study Plan Generator"
@@ -193,10 +193,11 @@ function StudyGuideGeneratorPage() {
           />
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            aria-label="Back to app"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:border-0 sm:px-0 sm:py-0 sm:text-sm"
           >
             <ArrowLeft className="size-4" />
-            Back to app
+            <span className="hidden sm:inline">Back to app</span>
           </Link>
         </div>
       </header>
@@ -212,15 +213,15 @@ function StudyGuideGeneratorPage() {
         />
       ) : (
         <>
-          <section className="space-y-4 text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              <Sparkles className="size-3.5" />
+          <section className="space-y-3 text-center sm:space-y-4">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:px-3 sm:py-1 sm:text-xs">
+              <Sparkles className="size-3 sm:size-3.5" />
               Free · no signup
             </span>
-            <h1 className="font-display text-3xl font-bold leading-[1.05] sm:text-5xl">
+            <h1 className="font-display text-2xl font-bold leading-[1.05] sm:text-5xl">
               study guide <span className="text-hype">generator</span>
             </h1>
-            <p className="mx-auto max-w-lg text-sm text-muted-foreground sm:text-base">
+            <p className="mx-auto max-w-lg text-xs text-muted-foreground sm:text-base">
               Tell it your exam, your syllabus and how many hours you actually have. Get a
               week-by-week timetable with topics to cover, colour-coded priorities and revision
               checkboxes — downloadable as a PDF.
@@ -228,17 +229,17 @@ function StudyGuideGeneratorPage() {
           </section>
 
           {loading ? (
-            <div className="surface-card glow-lime mt-10 flex flex-col items-center gap-4 p-10 text-center">
-              <Loader2 className="size-8 animate-spin text-primary" />
-              <p className="font-display text-lg font-bold">{LOADING_COPY[copyIndex]}</p>
+            <div className="surface-card glow-lime mt-6 flex flex-col items-center gap-3 p-6 text-center sm:mt-10 sm:gap-4 sm:p-10">
+              <Loader2 className="size-7 animate-spin text-primary sm:size-8" />
+              <p className="font-display text-base font-bold sm:text-lg">{LOADING_COPY[copyIndex]}</p>
               <p className="text-xs text-muted-foreground">
                 building {Math.min(weeks, 16)} weeks · {studyDays} days/week · {hours}h/day
               </p>
             </div>
           ) : (
-            <section className="surface-card mt-10 space-y-6 p-5 sm:p-6">
-              <div className="space-y-2">
-                <label htmlFor="exam" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <section className="surface-card mt-6 space-y-4 p-4 sm:mt-10 sm:space-y-6 sm:p-6">
+              <div className="space-y-1.5 sm:space-y-2">
+                <label htmlFor="exam" className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                   exam name
                 </label>
                 <input
@@ -247,13 +248,13 @@ function StudyGuideGeneratorPage() {
                   onChange={(e) => setExam(e.target.value)}
                   maxLength={120}
                   placeholder="Organic Chemistry Final"
-                  className="w-full rounded-xl border border-input bg-background/40 px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
+                  className="w-full rounded-xl border border-input bg-background/40 px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary sm:px-4 sm:py-3"
                 />
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="weeks" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label htmlFor="weeks" className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                     <CalendarDays className="size-3.5" /> weeks left
                   </label>
                   <input
@@ -268,14 +269,14 @@ function StudyGuideGeneratorPage() {
                       if (!Number.isNaN(n) && raw !== "") setWeeks(clampWeeks(n));
                     }}
                     onBlur={() => commitWeeks(weeksInput)}
-                    className="w-full rounded-xl border border-input bg-background/40 px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
+                    className="w-full rounded-xl border border-input bg-background/40 px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary sm:px-4 sm:py-3"
                   />
                   <p className="text-[11px] text-muted-foreground">
                     = <span className="text-primary">{daysLeft} days</span> left
                   </p>
                 </div>
-                <div className="space-y-2">
-                  <label htmlFor="hours" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label htmlFor="hours" className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                     <Clock className="size-3.5" /> hours per day · <span className="text-primary">{hours}h</span>
                   </label>
                   <input
@@ -286,7 +287,7 @@ function StudyGuideGeneratorPage() {
                     value={hours}
                     aria-label="Hours available to study per day"
                     onChange={(e) => setHours(Number(e.target.value))}
-                    className="w-full accent-[var(--primary)]"
+                    className="h-8 w-full accent-[var(--primary)] sm:h-auto"
                   />
                   <p className="text-[11px] text-muted-foreground">
                     total: <span className="text-primary">{totalHours}h</span> of study
@@ -294,17 +295,17 @@ function StudyGuideGeneratorPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-1.5 sm:space-y-2">
+                <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                   <CalendarDays className="size-3.5" /> study days per week
                 </span>
-                <div className="grid grid-cols-7 gap-1.5">
+                <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
                   {[1, 2, 3, 4, 5, 6, 7].map((d) => (
                     <button
                       key={d}
                       type="button"
                       onClick={() => setStudyDays(d)}
-                      className={`rounded-xl border py-2 text-xs font-bold transition-colors ${
+                      className={`rounded-lg border py-2 text-xs font-bold transition-colors sm:rounded-xl ${
                         studyDays === d
                           ? "border-primary bg-primary/15 text-primary"
                           : "border-border text-muted-foreground hover:text-foreground"
@@ -316,17 +317,17 @@ function StudyGuideGeneratorPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-1.5 sm:space-y-2">
+                <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                   <Target className="size-3.5" /> current level
                 </span>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                   {LEVELS.map((l) => (
                     <button
                       key={l.id}
                       type="button"
                       onClick={() => setLevel(l.id)}
-                      className={`rounded-xl border px-2 py-2.5 text-xs font-bold transition-colors ${
+                      className={`rounded-xl border px-1.5 py-2 text-[11px] font-bold transition-colors sm:px-2 sm:py-2.5 sm:text-xs ${
                         level === l.id
                           ? "border-primary bg-primary/15 text-primary"
                           : "border-border text-muted-foreground hover:text-foreground"
@@ -338,8 +339,8 @@ function StudyGuideGeneratorPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-1.5 sm:space-y-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                   syllabus
                 </span>
                 <textarea
@@ -348,11 +349,11 @@ function StudyGuideGeneratorPage() {
                     setSyllabus(e.target.value);
                     setFileName("");
                   }}
-                  rows={6}
+                  rows={5}
                   placeholder="Paste your syllabus, unit list or chapter names here..."
-                  className="w-full resize-y rounded-xl border border-input bg-background/40 px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
+                  className="w-full resize-y rounded-xl border border-input bg-background/40 px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary sm:px-4 sm:py-3"
                 />
-                <div className="text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                <div className="text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
                   or
                 </div>
                 <button
@@ -368,19 +369,19 @@ function StudyGuideGeneratorPage() {
                     setDragging(false);
                     void handleFile(e.dataTransfer.files?.[0]);
                   }}
-                  className={`flex w-full flex-col items-center gap-2 rounded-2xl border-2 border-dashed px-4 py-7 text-center transition-colors ${
+                  className={`flex w-full flex-col items-center gap-1.5 rounded-2xl border-2 border-dashed px-3 py-5 text-center transition-colors sm:gap-2 sm:px-4 sm:py-7 ${
                     dragging ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
                   }`}
                 >
                   {parsing ? (
-                    <Loader2 className="size-6 animate-spin text-primary" />
+                    <Loader2 className="size-5 animate-spin text-primary sm:size-6" />
                   ) : (
-                    <FileUp className="size-6 text-primary" />
+                    <FileUp className="size-5 text-primary sm:size-6" />
                   )}
-                  <span className="text-sm font-bold">
-                    {parsing ? "reading your PDF..." : fileName || "drop your syllabus PDF here"}
+                  <span className="text-xs font-bold sm:text-sm">
+                    {parsing ? "reading your PDF..." : fileName || "tap to upload your syllabus PDF"}
                   </span>
-                  <span className="text-xs text-muted-foreground">PDF only · max 25MB</span>
+                  <span className="text-[11px] text-muted-foreground sm:text-xs">PDF only · max 25MB</span>
                 </button>
                 <input
                   ref={inputRef}
@@ -392,7 +393,7 @@ function StudyGuideGeneratorPage() {
               </div>
 
               {error && (
-                <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-xs text-destructive sm:px-4 sm:py-3 sm:text-sm">
                   {error}
                 </p>
               )}
@@ -400,20 +401,20 @@ function StudyGuideGeneratorPage() {
               <button
                 type="button"
                 onClick={() => void submit()}
-                className="w-full rounded-xl bg-primary px-5 py-3.5 font-display text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+                className="w-full rounded-xl bg-primary px-5 py-3 font-display text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 sm:py-3.5"
               >
                 Generate Smart Study Plan
               </button>
             </section>
           )}
 
-          <section className="mt-12 space-y-4">
-            <h2 className="font-display text-2xl font-bold">questions people ask</h2>
-            <div className="space-y-3">
+          <section className="mt-8 space-y-3 sm:mt-12 sm:space-y-4">
+            <h2 className="font-display text-xl font-bold sm:text-2xl">questions people ask</h2>
+            <div className="space-y-2.5 sm:space-y-3">
               {faqs.map((f) => (
-                <div key={f.q} className="surface-card space-y-2 p-5">
-                  <h3 className="font-display text-base font-bold">{f.q}</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{f.a}</p>
+                <div key={f.q} className="surface-card space-y-1.5 p-4 sm:space-y-2 sm:p-5">
+                  <h3 className="font-display text-sm font-bold sm:text-base">{f.q}</h3>
+                  <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">{f.a}</p>
                 </div>
               ))}
             </div>
@@ -462,19 +463,19 @@ function PlanView({
   const progress = totalTopics ? Math.round((doneCount / totalTopics) * 100) : 0;
 
   return (
-    <div className="space-y-6">
-      <section className="surface-card glow-lime space-y-4 p-5 sm:p-6">
-        <h1 className="font-display text-2xl font-bold sm:text-3xl">{plan.title}</h1>
-        <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
+    <div className="space-y-4 sm:space-y-6">
+      <section className="surface-card glow-lime space-y-3 p-4 sm:space-y-4 sm:p-6">
+        <h1 className="font-display text-xl font-bold sm:text-3xl">{plan.title}</h1>
+        <div className="grid grid-cols-2 gap-1.5 text-center sm:grid-cols-4 sm:gap-2">
           {[
             { label: "exam", value: exam },
             { label: "weeks left", value: String(weeks) },
             { label: "days left", value: String(weeks * 7) },
             { label: "total hours", value: `${totalHours}h` },
           ].map((s) => (
-            <div key={s.label} className="rounded-xl border border-border p-3">
-              <div className="truncate font-display text-base font-bold">{s.value}</div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            <div key={s.label} className="min-w-0 rounded-xl border border-border p-2 sm:p-3">
+              <div className="truncate font-display text-sm font-bold sm:text-base">{s.value}</div>
+              <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[10px]">
                 {s.label}
               </div>
             </div>
@@ -511,7 +512,7 @@ function PlanView({
                 setDownloading(false);
               }
             }}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60 sm:px-5 sm:py-3"
           >
             {downloading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
             Download PDF
@@ -519,7 +520,7 @@ function PlanView({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground sm:px-5 sm:py-3"
           >
             <RotateCcw className="size-4" />
             New plan
@@ -528,11 +529,11 @@ function PlanView({
       </section>
 
       {plan.strategy.length > 0 && (
-        <section className="surface-card space-y-2 p-5">
-          <h2 className="font-display text-lg font-bold">the game plan</h2>
+        <section className="surface-card space-y-2 p-4 sm:p-5">
+          <h2 className="font-display text-base font-bold sm:text-lg">the game plan</h2>
           <ul className="space-y-1.5">
             {plan.strategy.map((s) => (
-              <li key={s} className="flex gap-2 text-sm text-muted-foreground">
+              <li key={s} className="flex gap-2 text-xs text-muted-foreground sm:text-sm">
                 <span className="text-primary">→</span>
                 <span className="leading-relaxed">{s}</span>
               </li>
@@ -541,7 +542,7 @@ function PlanView({
         </section>
       )}
 
-      <div className="flex flex-wrap gap-2 text-[11px] font-bold uppercase tracking-wider">
+      <div className="flex flex-wrap gap-1.5 text-[10px] font-bold uppercase tracking-wider sm:gap-2 sm:text-[11px]">
         <span className="rounded-full border border-destructive/30 bg-destructive/15 px-2.5 py-1 text-destructive">
           high yield
         </span>
@@ -553,24 +554,31 @@ function PlanView({
         </span>
       </div>
 
-      <section className="space-y-4">
+      <section className="space-y-3 sm:space-y-4">
         {plan.weeks.map((week) => {
           const weekMinutes = week.days.reduce(
             (m, d) => m + d.items.reduce((s, i) => s + i.minutes, 0),
             0,
           );
           return (
-            <div key={week.week} className="surface-card space-y-4 p-5">
-              <div className="flex items-baseline justify-between gap-3">
-                <h3 className="font-display text-lg font-bold">Week {week.week}</h3>
-                <span className="truncate text-xs text-muted-foreground">
-                  {week.theme} · {Math.round(weekMinutes / 60)}h
+            <div key={week.week} className="surface-card space-y-3 p-4 sm:space-y-4 sm:p-5">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 sm:gap-3">
+                <h3 className="truncate font-display text-base font-bold sm:text-lg">
+                  Week {week.week}
+                  {week.theme && (
+                    <span className="ml-2 text-xs font-normal text-muted-foreground sm:text-sm">
+                      {week.theme}
+                    </span>
+                  )}
+                </h3>
+                <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary sm:text-xs">
+                  {Math.round(weekMinutes / 60)}h
                 </span>
               </div>
 
               {week.topics.length > 0 && (
                 <div className="space-y-2 rounded-xl border border-border/70 bg-background/30 p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-primary sm:text-[11px]">
                     topics to cover this week
                   </div>
                   {week.topics.map((t, ti) => {
@@ -578,16 +586,16 @@ function PlanView({
                     return (
                       <label
                         key={id}
-                        className="flex cursor-pointer flex-wrap items-center gap-2 text-sm"
+                        className="flex cursor-pointer flex-wrap items-center gap-2 text-xs sm:text-sm"
                       >
                         <input
                           type="checkbox"
                           checked={!!done[id]}
                           onChange={(e) => setDone((d) => ({ ...d, [id]: e.target.checked }))}
-                          className="size-4 accent-[var(--primary)]"
+                          className="size-4 shrink-0 accent-[var(--primary)]"
                         />
                         <span
-                          className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${
+                          className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase sm:text-[10px] ${
                             PRIORITY_STYLE[t.priority] ?? PRIORITY_STYLE["medium"]
                           }`}
                         >
@@ -598,10 +606,10 @@ function PlanView({
                         >
                           {t.topic}
                           {t.note && (
-                            <span className="block text-xs text-muted-foreground">{t.note}</span>
+                            <span className="block text-[11px] text-muted-foreground sm:text-xs">{t.note}</span>
                           )}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="shrink-0 text-[11px] text-muted-foreground sm:text-xs">
                           {Math.round(t.minutes / 60)}h
                         </span>
                       </label>
@@ -609,6 +617,7 @@ function PlanView({
                   })}
                 </div>
               )}
+
 
               <div className="space-y-3">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
