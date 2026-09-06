@@ -213,15 +213,15 @@ function StudyGuideGeneratorPage() {
         />
       ) : (
         <>
-          <section className="space-y-4 text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              <Sparkles className="size-3.5" />
+          <section className="space-y-3 text-center sm:space-y-4">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:px-3 sm:py-1 sm:text-xs">
+              <Sparkles className="size-3 sm:size-3.5" />
               Free · no signup
             </span>
-            <h1 className="font-display text-3xl font-bold leading-[1.05] sm:text-5xl">
+            <h1 className="font-display text-2xl font-bold leading-[1.05] sm:text-5xl">
               study guide <span className="text-hype">generator</span>
             </h1>
-            <p className="mx-auto max-w-lg text-sm text-muted-foreground sm:text-base">
+            <p className="mx-auto max-w-lg text-xs text-muted-foreground sm:text-base">
               Tell it your exam, your syllabus and how many hours you actually have. Get a
               week-by-week timetable with topics to cover, colour-coded priorities and revision
               checkboxes — downloadable as a PDF.
