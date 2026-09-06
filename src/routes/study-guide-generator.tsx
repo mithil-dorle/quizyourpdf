@@ -408,13 +408,13 @@ function StudyGuideGeneratorPage() {
             </section>
           )}
 
-          <section className="mt-12 space-y-4">
-            <h2 className="font-display text-2xl font-bold">questions people ask</h2>
-            <div className="space-y-3">
+          <section className="mt-8 space-y-3 sm:mt-12 sm:space-y-4">
+            <h2 className="font-display text-xl font-bold sm:text-2xl">questions people ask</h2>
+            <div className="space-y-2.5 sm:space-y-3">
               {faqs.map((f) => (
-                <div key={f.q} className="surface-card space-y-2 p-5">
-                  <h3 className="font-display text-base font-bold">{f.q}</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{f.a}</p>
+                <div key={f.q} className="surface-card space-y-1.5 p-4 sm:space-y-2 sm:p-5">
+                  <h3 className="font-display text-sm font-bold sm:text-base">{f.q}</h3>
+                  <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">{f.a}</p>
                 </div>
               ))}
             </div>
