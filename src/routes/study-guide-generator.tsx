@@ -177,15 +177,15 @@ function StudyGuideGeneratorPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-3xl px-4 py-8 sm:px-5 sm:py-10">
-      <header className="mb-8 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="grid size-10 place-items-center rounded-2xl bg-primary text-primary-foreground">
-            <Zap className="size-5" />
+    <main className="mx-auto min-h-screen w-full max-w-3xl px-3 py-5 sm:px-5 sm:py-10">
+      <header className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:mb-8 sm:flex sm:justify-between">
+        <Link to="/" className="flex min-w-0 items-center gap-2">
+          <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground sm:size-10 sm:rounded-2xl">
+            <Zap className="size-4 sm:size-5" />
           </span>
-          <span className="font-display text-xl font-bold">QuizLab</span>
+          <span className="truncate font-display text-lg font-bold sm:text-xl">QuizLab</span>
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <ShareDialog
             url="https://quizyourpdf.com/study-guide-generator"
             title="QuizLab — Smart Study Plan Generator"
@@ -193,10 +193,11 @@ function StudyGuideGeneratorPage() {
           />
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            aria-label="Back to app"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:border-0 sm:px-0 sm:py-0 sm:text-sm"
           >
             <ArrowLeft className="size-4" />
-            Back to app
+            <span className="hidden sm:inline">Back to app</span>
           </Link>
         </div>
       </header>
