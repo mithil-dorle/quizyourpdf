@@ -295,17 +295,17 @@ function StudyGuideGeneratorPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-1.5 sm:space-y-2">
+                <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                   <CalendarDays className="size-3.5" /> study days per week
                 </span>
-                <div className="grid grid-cols-7 gap-1.5">
+                <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
                   {[1, 2, 3, 4, 5, 6, 7].map((d) => (
                     <button
                       key={d}
                       type="button"
                       onClick={() => setStudyDays(d)}
-                      className={`rounded-xl border py-2 text-xs font-bold transition-colors ${
+                      className={`rounded-lg border py-2 text-xs font-bold transition-colors sm:rounded-xl ${
                         studyDays === d
                           ? "border-primary bg-primary/15 text-primary"
                           : "border-border text-muted-foreground hover:text-foreground"
@@ -317,17 +317,17 @@ function StudyGuideGeneratorPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-1.5 sm:space-y-2">
+                <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                   <Target className="size-3.5" /> current level
                 </span>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
                   {LEVELS.map((l) => (
                     <button
                       key={l.id}
                       type="button"
                       onClick={() => setLevel(l.id)}
-                      className={`rounded-xl border px-2 py-2.5 text-xs font-bold transition-colors ${
+                      className={`rounded-xl border px-1.5 py-2 text-[11px] font-bold transition-colors sm:px-2 sm:py-2.5 sm:text-xs ${
                         level === l.id
                           ? "border-primary bg-primary/15 text-primary"
                           : "border-border text-muted-foreground hover:text-foreground"
