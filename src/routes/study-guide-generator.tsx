@@ -339,8 +339,8 @@ function StudyGuideGeneratorPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-1.5 sm:space-y-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                   syllabus
                 </span>
                 <textarea
@@ -349,11 +349,11 @@ function StudyGuideGeneratorPage() {
                     setSyllabus(e.target.value);
                     setFileName("");
                   }}
-                  rows={6}
+                  rows={5}
                   placeholder="Paste your syllabus, unit list or chapter names here..."
-                  className="w-full resize-y rounded-xl border border-input bg-background/40 px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
+                  className="w-full resize-y rounded-xl border border-input bg-background/40 px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary sm:px-4 sm:py-3"
                 />
-                <div className="text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                <div className="text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
                   or
                 </div>
                 <button
@@ -369,19 +369,19 @@ function StudyGuideGeneratorPage() {
                     setDragging(false);
                     void handleFile(e.dataTransfer.files?.[0]);
                   }}
-                  className={`flex w-full flex-col items-center gap-2 rounded-2xl border-2 border-dashed px-4 py-7 text-center transition-colors ${
+                  className={`flex w-full flex-col items-center gap-1.5 rounded-2xl border-2 border-dashed px-3 py-5 text-center transition-colors sm:gap-2 sm:px-4 sm:py-7 ${
                     dragging ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
                   }`}
                 >
                   {parsing ? (
-                    <Loader2 className="size-6 animate-spin text-primary" />
+                    <Loader2 className="size-5 animate-spin text-primary sm:size-6" />
                   ) : (
-                    <FileUp className="size-6 text-primary" />
+                    <FileUp className="size-5 text-primary sm:size-6" />
                   )}
-                  <span className="text-sm font-bold">
-                    {parsing ? "reading your PDF..." : fileName || "drop your syllabus PDF here"}
+                  <span className="text-xs font-bold sm:text-sm">
+                    {parsing ? "reading your PDF..." : fileName || "tap to upload your syllabus PDF"}
                   </span>
-                  <span className="text-xs text-muted-foreground">PDF only · max 25MB</span>
+                  <span className="text-[11px] text-muted-foreground sm:text-xs">PDF only · max 25MB</span>
                 </button>
                 <input
                   ref={inputRef}
@@ -393,7 +393,7 @@ function StudyGuideGeneratorPage() {
               </div>
 
               {error && (
-                <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-xs text-destructive sm:px-4 sm:py-3 sm:text-sm">
                   {error}
                 </p>
               )}
@@ -401,7 +401,7 @@ function StudyGuideGeneratorPage() {
               <button
                 type="button"
                 onClick={() => void submit()}
-                className="w-full rounded-xl bg-primary px-5 py-3.5 font-display text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+                className="w-full rounded-xl bg-primary px-5 py-3 font-display text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 sm:py-3.5"
               >
                 Generate Smart Study Plan
               </button>
