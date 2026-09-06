@@ -463,19 +463,19 @@ function PlanView({
   const progress = totalTopics ? Math.round((doneCount / totalTopics) * 100) : 0;
 
   return (
-    <div className="space-y-6">
-      <section className="surface-card glow-lime space-y-4 p-5 sm:p-6">
-        <h1 className="font-display text-2xl font-bold sm:text-3xl">{plan.title}</h1>
-        <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
+    <div className="space-y-4 sm:space-y-6">
+      <section className="surface-card glow-lime space-y-3 p-4 sm:space-y-4 sm:p-6">
+        <h1 className="font-display text-xl font-bold sm:text-3xl">{plan.title}</h1>
+        <div className="grid grid-cols-2 gap-1.5 text-center sm:grid-cols-4 sm:gap-2">
           {[
             { label: "exam", value: exam },
             { label: "weeks left", value: String(weeks) },
             { label: "days left", value: String(weeks * 7) },
             { label: "total hours", value: `${totalHours}h` },
           ].map((s) => (
-            <div key={s.label} className="rounded-xl border border-border p-3">
-              <div className="truncate font-display text-base font-bold">{s.value}</div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            <div key={s.label} className="min-w-0 rounded-xl border border-border p-2 sm:p-3">
+              <div className="truncate font-display text-sm font-bold sm:text-base">{s.value}</div>
+              <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[10px]">
                 {s.label}
               </div>
             </div>
