@@ -229,17 +229,17 @@ function StudyGuideGeneratorPage() {
           </section>
 
           {loading ? (
-            <div className="surface-card glow-lime mt-10 flex flex-col items-center gap-4 p-10 text-center">
-              <Loader2 className="size-8 animate-spin text-primary" />
-              <p className="font-display text-lg font-bold">{LOADING_COPY[copyIndex]}</p>
+            <div className="surface-card glow-lime mt-6 flex flex-col items-center gap-3 p-6 text-center sm:mt-10 sm:gap-4 sm:p-10">
+              <Loader2 className="size-7 animate-spin text-primary sm:size-8" />
+              <p className="font-display text-base font-bold sm:text-lg">{LOADING_COPY[copyIndex]}</p>
               <p className="text-xs text-muted-foreground">
                 building {Math.min(weeks, 16)} weeks · {studyDays} days/week · {hours}h/day
               </p>
             </div>
           ) : (
-            <section className="surface-card mt-10 space-y-6 p-5 sm:p-6">
-              <div className="space-y-2">
-                <label htmlFor="exam" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <section className="surface-card mt-6 space-y-4 p-4 sm:mt-10 sm:space-y-6 sm:p-6">
+              <div className="space-y-1.5 sm:space-y-2">
+                <label htmlFor="exam" className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                   exam name
                 </label>
                 <input
@@ -248,7 +248,7 @@ function StudyGuideGeneratorPage() {
                   onChange={(e) => setExam(e.target.value)}
                   maxLength={120}
                   placeholder="Organic Chemistry Final"
-                  className="w-full rounded-xl border border-input bg-background/40 px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
+                  className="w-full rounded-xl border border-input bg-background/40 px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary sm:px-4 sm:py-3"
                 />
               </div>
 
