@@ -512,7 +512,7 @@ function PlanView({
                 setDownloading(false);
               }
             }}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60 sm:px-5 sm:py-3"
           >
             {downloading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
             Download PDF
@@ -520,7 +520,7 @@ function PlanView({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-muted-foreground transition-colors hover:text-foreground sm:px-5 sm:py-3"
           >
             <RotateCcw className="size-4" />
             New plan
