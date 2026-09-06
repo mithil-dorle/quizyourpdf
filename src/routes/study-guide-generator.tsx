@@ -529,11 +529,11 @@ function PlanView({
       </section>
 
       {plan.strategy.length > 0 && (
-        <section className="surface-card space-y-2 p-5">
-          <h2 className="font-display text-lg font-bold">the game plan</h2>
+        <section className="surface-card space-y-2 p-4 sm:p-5">
+          <h2 className="font-display text-base font-bold sm:text-lg">the game plan</h2>
           <ul className="space-y-1.5">
             {plan.strategy.map((s) => (
-              <li key={s} className="flex gap-2 text-sm text-muted-foreground">
+              <li key={s} className="flex gap-2 text-xs text-muted-foreground sm:text-sm">
                 <span className="text-primary">→</span>
                 <span className="leading-relaxed">{s}</span>
               </li>
@@ -542,7 +542,7 @@ function PlanView({
         </section>
       )}
 
-      <div className="flex flex-wrap gap-2 text-[11px] font-bold uppercase tracking-wider">
+      <div className="flex flex-wrap gap-1.5 text-[10px] font-bold uppercase tracking-wider sm:gap-2 sm:text-[11px]">
         <span className="rounded-full border border-destructive/30 bg-destructive/15 px-2.5 py-1 text-destructive">
           high yield
         </span>
@@ -554,24 +554,31 @@ function PlanView({
         </span>
       </div>
 
-      <section className="space-y-4">
+      <section className="space-y-3 sm:space-y-4">
         {plan.weeks.map((week) => {
           const weekMinutes = week.days.reduce(
             (m, d) => m + d.items.reduce((s, i) => s + i.minutes, 0),
             0,
           );
           return (
-            <div key={week.week} className="surface-card space-y-4 p-5">
-              <div className="flex items-baseline justify-between gap-3">
-                <h3 className="font-display text-lg font-bold">Week {week.week}</h3>
-                <span className="truncate text-xs text-muted-foreground">
-                  {week.theme} · {Math.round(weekMinutes / 60)}h
+            <div key={week.week} className="surface-card space-y-3 p-4 sm:space-y-4 sm:p-5">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 sm:gap-3">
+                <h3 className="truncate font-display text-base font-bold sm:text-lg">
+                  Week {week.week}
+                  {week.theme && (
+                    <span className="ml-2 text-xs font-normal text-muted-foreground sm:text-sm">
+                      {week.theme}
+                    </span>
+                  )}
+                </h3>
+                <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary sm:text-xs">
+                  {Math.round(weekMinutes / 60)}h
                 </span>
               </div>
 
               {week.topics.length > 0 && (
                 <div className="space-y-2 rounded-xl border border-border/70 bg-background/30 p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-primary sm:text-[11px]">
                     topics to cover this week
                   </div>
                   {week.topics.map((t, ti) => {
@@ -579,16 +586,16 @@ function PlanView({
                     return (
                       <label
                         key={id}
-                        className="flex cursor-pointer flex-wrap items-center gap-2 text-sm"
+                        className="flex cursor-pointer flex-wrap items-center gap-2 text-xs sm:text-sm"
                       >
                         <input
                           type="checkbox"
                           checked={!!done[id]}
                           onChange={(e) => setDone((d) => ({ ...d, [id]: e.target.checked }))}
-                          className="size-4 accent-[var(--primary)]"
+                          className="size-4 shrink-0 accent-[var(--primary)]"
                         />
                         <span
-                          className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${
+                          className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase sm:text-[10px] ${
                             PRIORITY_STYLE[t.priority] ?? PRIORITY_STYLE["medium"]
                           }`}
                         >
@@ -599,10 +606,10 @@ function PlanView({
                         >
                           {t.topic}
                           {t.note && (
-                            <span className="block text-xs text-muted-foreground">{t.note}</span>
+                            <span className="block text-[11px] text-muted-foreground sm:text-xs">{t.note}</span>
                           )}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="shrink-0 text-[11px] text-muted-foreground sm:text-xs">
                           {Math.round(t.minutes / 60)}h
                         </span>
                       </label>
@@ -610,6 +617,7 @@ function PlanView({
                   })}
                 </div>
               )}
+
 
               <div className="space-y-3">
                 <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
