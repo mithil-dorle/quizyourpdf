@@ -252,9 +252,9 @@ function StudyGuideGeneratorPage() {
                 />
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label htmlFor="weeks" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label htmlFor="weeks" className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                     <CalendarDays className="size-3.5" /> weeks left
                   </label>
                   <input
@@ -269,14 +269,14 @@ function StudyGuideGeneratorPage() {
                       if (!Number.isNaN(n) && raw !== "") setWeeks(clampWeeks(n));
                     }}
                     onBlur={() => commitWeeks(weeksInput)}
-                    className="w-full rounded-xl border border-input bg-background/40 px-4 py-3 text-sm outline-none transition-colors focus:border-primary"
+                    className="w-full rounded-xl border border-input bg-background/40 px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary sm:px-4 sm:py-3"
                   />
                   <p className="text-[11px] text-muted-foreground">
                     = <span className="text-primary">{daysLeft} days</span> left
                   </p>
                 </div>
-                <div className="space-y-2">
-                  <label htmlFor="hours" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <div className="space-y-1.5 sm:space-y-2">
+                  <label htmlFor="hours" className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground sm:text-xs">
                     <Clock className="size-3.5" /> hours per day · <span className="text-primary">{hours}h</span>
                   </label>
                   <input
@@ -287,7 +287,7 @@ function StudyGuideGeneratorPage() {
                     value={hours}
                     aria-label="Hours available to study per day"
                     onChange={(e) => setHours(Number(e.target.value))}
-                    className="w-full accent-[var(--primary)]"
+                    className="h-8 w-full accent-[var(--primary)] sm:h-auto"
                   />
                   <p className="text-[11px] text-muted-foreground">
                     total: <span className="text-primary">{totalHours}h</span> of study
