@@ -6,8 +6,7 @@ make it genz oriented
 
 This project was built with [Lovable](https://lovable.dev).
 
-**Live app**: https://quizyourpdf.lovable.app
-              https://quizyourpdf.com/
+**Live app**:  https://quizyourpdf.com/
 
 ## Development
 
