@@ -7,14 +7,7 @@ make it genz oriented
 This project was built with [Lovable](https://lovable.dev).
 
 **Live app**: https://quizyourpdf.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/1259bd88-a489-4b88-8028-a208baab9264).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+              https://quizyourpdf.com/
 
 ## Development
 
