@@ -140,7 +140,7 @@ export function ShareDialog({ url, title, text, label }: ShareDialogProps) {
           {label ?? "share"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="surface-card max-w-sm border-border">
+      <DialogContent className="surface-card w-[calc(100vw-1.5rem)] max-w-sm border-border">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">pass it on 🚀</DialogTitle>
           <DialogDescription>
