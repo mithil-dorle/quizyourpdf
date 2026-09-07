@@ -140,7 +140,7 @@ export function ShareDialog({ url, title, text, label }: ShareDialogProps) {
           {label ?? "share"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="surface-card w-[calc(100vw-1.5rem)] max-w-sm border-border">
+      <DialogContent className="surface-card w-[calc(100vw-1.5rem)] max-w-sm overflow-hidden border-border">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">pass it on 🚀</DialogTitle>
           <DialogDescription>
@@ -170,9 +170,9 @@ export function ShareDialog({ url, title, text, label }: ShareDialogProps) {
 
         <button
           onClick={copyLink}
-          className="mt-1 flex w-full items-center gap-2 rounded-2xl border border-border/60 bg-card/60 p-2 pl-3 text-left transition-colors hover:border-primary/40"
+          className="mt-1 flex w-full min-w-0 items-center gap-2 rounded-2xl border border-border/60 bg-card/60 p-2 pl-3 text-left transition-colors hover:border-primary/40"
         >
-          <span className="flex-1 truncate text-sm text-muted-foreground">{url}</span>
+          <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{url}</span>
           <span
             className={`grid size-9 shrink-0 place-items-center rounded-xl transition-colors ${
               copied ? "bg-success text-success-foreground" : "bg-primary text-primary-foreground"
