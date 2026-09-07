@@ -619,39 +619,39 @@ function PlanView({
               )}
 
 
-              <div className="space-y-3">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-2.5 sm:space-y-3">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground sm:text-[11px]">
                   weekly timetable
                 </div>
                 {week.days.map((day, di) => (
-                  <div key={`${week.week}-${di}`} className="space-y-2">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-display text-sm font-bold text-primary">{day.name}</span>
-                      <span className="truncate text-xs text-muted-foreground">{day.focus}</span>
+                  <div key={`${week.week}-${di}`} className="space-y-1.5 sm:space-y-2">
+                    <div className="grid grid-cols-[minmax(0,auto)_minmax(0,1fr)] items-baseline gap-2">
+                      <span className="font-display text-xs font-bold text-primary sm:text-sm">{day.name}</span>
+                      <span className="truncate text-[11px] text-muted-foreground sm:text-xs">{day.focus}</span>
                     </div>
                     {day.items.map((item, ii) => (
                       <div
                         key={`${week.week}-${di}-${ii}`}
-                        className="flex flex-wrap items-center gap-2 rounded-xl border border-border px-3 py-2.5"
+                        className="flex flex-wrap items-center gap-1.5 rounded-lg border border-border px-2.5 py-2 sm:gap-2 sm:rounded-xl sm:px-3 sm:py-2.5"
                       >
                         <span
-                          className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${
+                          className={`shrink-0 rounded-full border px-1.5 py-0.5 text-[9px] font-bold uppercase sm:px-2 sm:text-[10px] ${
                             PRIORITY_STYLE[item.priority] ?? PRIORITY_STYLE["medium"]
                           }`}
                         >
                           {item.priority}
                         </span>
-                        <span className="min-w-0 flex-1 text-sm font-medium">
+                        <span className="min-w-0 flex-1 text-xs font-medium sm:text-sm">
                           {item.topic}
                           {item.note && (
-                            <span className="block text-xs text-muted-foreground">{item.note}</span>
+                            <span className="block text-[11px] text-muted-foreground sm:text-xs">{item.note}</span>
                           )}
                         </span>
-                        <span className="text-xs text-muted-foreground">{item.minutes}m</span>
-                        <span className="flex items-center gap-1 text-muted-foreground/60">
-                          <CheckSquare className="size-3.5" />
-                          <CheckSquare className="size-3.5" />
-                          <CheckSquare className="size-3.5" />
+                        <span className="shrink-0 text-[11px] text-muted-foreground sm:text-xs">{item.minutes}m</span>
+                        <span className="flex shrink-0 items-center gap-0.5 text-muted-foreground/60 sm:gap-1">
+                          <CheckSquare className="size-3 sm:size-3.5" />
+                          <CheckSquare className="size-3 sm:size-3.5" />
+                          <CheckSquare className="size-3 sm:size-3.5" />
                         </span>
                       </div>
                     ))}
@@ -660,8 +660,8 @@ function PlanView({
               </div>
 
               {week.milestone && (
-                <p className="flex items-start gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2.5 text-sm">
-                  <Flag className="mt-0.5 size-4 shrink-0 text-primary" />
+                <p className="flex items-start gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-xs sm:py-2.5 sm:text-sm">
+                  <Flag className="mt-0.5 size-3.5 shrink-0 text-primary sm:size-4" />
                   <span>
                     <span className="font-bold">milestone:</span> {week.milestone}
                   </span>
@@ -671,6 +671,31 @@ function PlanView({
           );
         })}
       </section>
+
+      <div className="sticky bottom-3 z-10 sm:hidden">
+        <button
+          type="button"
+          disabled={downloading}
+          onClick={async () => {
+            setDownloading(true);
+            try {
+              await downloadStudyPlanPdf({
+                plan,
+                exam,
+                weeks,
+                hoursPerDay: hours,
+                studyDaysPerWeek: studyDays,
+              });
+            } finally {
+              setDownloading(false);
+            }
+          }}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 font-display text-sm font-bold text-primary-foreground shadow-lg shadow-primary/30 transition-colors hover:bg-primary/90 disabled:opacity-60"
+        >
+          {downloading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+          Download PDF
+        </button>
+      </div>
     </div>
   );
 }
