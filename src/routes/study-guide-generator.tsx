@@ -24,6 +24,39 @@ const DESCRIPTION =
   "Free AI study guide generator: paste your syllabus or drop a PDF and get a week-by-week study timetable with topics to cover, colour-coded priorities and revision checkboxes you can download as a PDF.";
 const URL = "https://quizyourpdf.com/study-guide-generator";
 
+const PLAN_FEATURES = [
+  {
+    icon: CalendarDays,
+    title: "Week-by-week timetable",
+    body: "A clear weekly schedule with themes, topics to cover and end-of-week milestones.",
+  },
+  {
+    icon: Flag,
+    title: "Priority-coded topics",
+    body: "High-yield, medium and low topics are colour-coded so you always hit the big stuff first.",
+  },
+  {
+    icon: Download,
+    title: "Downloadable PDF",
+    body: "Export a printable plan with revision checkboxes (1st, 2nd, 3rd) next to every topic.",
+  },
+  {
+    icon: FileUp,
+    title: "Syllabus in, plan out",
+    body: "Paste your syllabus text or drop a PDF — the AI pulls the real topics, no generic filler.",
+  },
+  {
+    icon: Clock,
+    title: "Fits your actual time",
+    body: "Set weeks left, study days per week and hours per day — the plan matches your real capacity.",
+  },
+  {
+    icon: Target,
+    title: "Built for your level",
+    body: "Starting from scratch or mostly revising? The schedule adapts to where you're at.",
+  },
+];
+
 const LEVELS = [
   { id: "Starting from scratch", label: "from scratch" },
   { id: "Halfway there", label: "halfway there" },
