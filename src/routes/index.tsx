@@ -3,9 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Brain,
+  CalendarDays,
   ClipboardList,
   Clock,
+  Download,
   Gamepad2,
+  ListChecks,
   SkipForward,
   FileUp,
   Flame,
@@ -18,6 +21,7 @@ import {
   Sparkles,
   Star,
   Target,
+  Timer,
   Trophy,
   Upload,
   Zap,
@@ -431,6 +435,7 @@ function Index() {
             )}
           </Button>
 
+          <FeaturesMini />
           <HowItWorksMini />
           <TestimonialsMini />
           <FeedbackForm className="mt-2" />
