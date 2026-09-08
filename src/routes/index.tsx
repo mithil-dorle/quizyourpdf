@@ -431,6 +431,7 @@ function Index() {
             )}
           </Button>
 
+          <FeaturesMini />
           <HowItWorksMini />
           <TestimonialsMini />
           <FeedbackForm className="mt-2" />
@@ -507,6 +508,65 @@ const HOW_STEPS = [
     body: "Each answer is cross-checked with sources and confidence scores.",
   },
 ];
+
+const QUIZ_FEATURES = [
+  {
+    icon: Gamepad2,
+    title: "Two game modes",
+    body: "Practice mode shows answers + fact-checks instantly. Exam mode locks everything until the end — real test vibes.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Internet fact-check",
+    body: "Every question gets cross-checked with real sources, a confidence score, and a suggested fix if it's sus.",
+  },
+  {
+    icon: Flame,
+    title: "Timer & streaks",
+    body: "Race the countdown, stack streaks, and pause the clock while you read a fact-check.",
+  },
+  {
+    icon: Target,
+    title: "Topic breakdown",
+    body: "Results show accuracy per topic so you know exactly what to re-study.",
+  },
+  {
+    icon: FileUp,
+    title: "Whole PDF, no cap",
+    body: "We read every page of your notes, slides or textbook chapter — no page limit.",
+  },
+  {
+    icon: RotateCcw,
+    title: "Endless new quizzes",
+    body: "Regenerate a fresh question set from the same PDF with one tap.",
+  },
+];
+
+function FeaturesMini() {
+  return (
+    <div className="surface-card space-y-5 p-5 sm:p-6">
+      <div className="text-center">
+        <h2 className="font-display text-xl font-bold">
+          why it <span className="text-hype">slaps</span>
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          features that make studying feel like a game
+        </p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {QUIZ_FEATURES.map((f) => (
+          <div key={f.title} className="rounded-2xl border border-border bg-secondary/40 p-4 transition-transform hover:-translate-y-0.5">
+            <span className="mb-2 grid size-9 place-items-center rounded-xl bg-accent/10 text-accent">
+              <f.icon className="size-5" />
+            </span>
+            <h3 className="font-display text-sm font-bold">{f.title}</h3>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{f.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function HowItWorksMini() {
   return (

@@ -24,6 +24,39 @@ const DESCRIPTION =
   "Free AI study guide generator: paste your syllabus or drop a PDF and get a week-by-week study timetable with topics to cover, colour-coded priorities and revision checkboxes you can download as a PDF.";
 const URL = "https://quizyourpdf.com/study-guide-generator";
 
+const PLAN_FEATURES = [
+  {
+    icon: CalendarDays,
+    title: "Week-by-week timetable",
+    body: "A clear weekly schedule with themes, topics to cover and end-of-week milestones.",
+  },
+  {
+    icon: Flag,
+    title: "Priority-coded topics",
+    body: "High-yield, medium and low topics are colour-coded so you always hit the big stuff first.",
+  },
+  {
+    icon: Download,
+    title: "Downloadable PDF",
+    body: "Export a printable plan with revision checkboxes (1st, 2nd, 3rd) next to every topic.",
+  },
+  {
+    icon: FileUp,
+    title: "Syllabus in, plan out",
+    body: "Paste your syllabus text or drop a PDF — the AI pulls the real topics, no generic filler.",
+  },
+  {
+    icon: Clock,
+    title: "Fits your actual time",
+    body: "Set weeks left, study days per week and hours per day — the plan matches your real capacity.",
+  },
+  {
+    icon: Target,
+    title: "Built for your level",
+    body: "Starting from scratch or mostly revising? The schedule adapts to where you're at.",
+  },
+];
+
 const LEVELS = [
   { id: "Starting from scratch", label: "from scratch" },
   { id: "Halfway there", label: "halfway there" },
@@ -407,6 +440,31 @@ function StudyGuideGeneratorPage() {
               </button>
             </section>
           )}
+
+          <section className="mt-8 space-y-4 sm:mt-12 sm:space-y-5">
+            <div className="text-center">
+              <h2 className="font-display text-xl font-bold sm:text-2xl">
+                why it's <span className="text-hype">actually useful</span>
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
+                built for real exam prep, not just a pretty calendar
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {PLAN_FEATURES.map((f) => (
+                <div
+                  key={f.title}
+                  className="surface-card p-4 transition-transform hover:-translate-y-0.5 sm:p-5"
+                >
+                  <span className="mb-2 grid size-9 place-items-center rounded-xl bg-accent/10 text-accent">
+                    <f.icon className="size-5" />
+                  </span>
+                  <h3 className="font-display text-sm font-bold sm:text-base">{f.title}</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{f.body}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           <section className="mt-8 space-y-3 sm:mt-12 sm:space-y-4">
             <h2 className="font-display text-xl font-bold sm:text-2xl">questions people ask</h2>
