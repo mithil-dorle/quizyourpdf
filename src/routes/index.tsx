@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Brain,
@@ -482,6 +482,124 @@ function Index() {
 
 
     </main>
+  );
+}
+
+const QUIZ_FEATURES = [
+  {
+    icon: Brain,
+    title: "AI-built questions",
+    body: "Questions crafted from your actual PDF — never generic trivia.",
+  },
+  {
+    icon: SlidersHorizontal,
+    title: "Full control",
+    body: "Question count, time per question, difficulty: Chill, Mid or Brutal.",
+  },
+  {
+    icon: Timer,
+    title: "Practice & Exam modes",
+    body: "Instant feedback or locked answers with a full breakdown at the end.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Source fact-checks",
+    body: "Every answer cross-checked online with confidence scores and evidence.",
+  },
+  {
+    icon: Flame,
+    title: "Streaks & scores",
+    body: "Race the timer, build streaks, and watch your topic accuracy climb.",
+  },
+];
+
+const PLAN_FEATURES = [
+  {
+    icon: CalendarDays,
+    title: "Week-by-week timetable",
+    body: "Tell it your exam date and hours — get a full weekly schedule.",
+  },
+  {
+    icon: Upload,
+    title: "Syllabus in, plan out",
+    body: "Paste your syllabus or drop the PDF — the AI pulls the real topics.",
+  },
+  {
+    icon: ListChecks,
+    title: "Priorities & milestones",
+    body: "High-yield topics flagged, with an end-of-week milestone to hit.",
+  },
+  {
+    icon: Download,
+    title: "Printable PDF",
+    body: "Color-coded schedule with 1st/2nd/3rd revision checkboxes.",
+  },
+];
+
+function FeaturesMini() {
+  return (
+    <div className="surface-card space-y-5 p-5 sm:p-6">
+      <div className="text-center">
+        <h2 className="font-display text-xl font-bold">
+          packed with <span className="text-hype">features</span>
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          two tools, one goal: make studying actually stick
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <Gamepad2 className="size-4 text-accent" /> quiz generator
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {QUIZ_FEATURES.map((f) => (
+            <div
+              key={f.title}
+              className="flex items-start gap-3 rounded-2xl border border-border bg-secondary/40 p-4 transition-transform hover:-translate-y-0.5"
+            >
+              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent/10 text-accent">
+                <f.icon className="size-5" />
+              </span>
+              <div>
+                <h3 className="font-display text-sm font-bold">{f.title}</h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">{f.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <CalendarDays className="size-4 text-accent" /> study plan generator
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {PLAN_FEATURES.map((f) => (
+            <div
+              key={f.title}
+              className="flex items-start gap-3 rounded-2xl border border-border bg-secondary/40 p-4 transition-transform hover:-translate-y-0.5"
+            >
+              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                <f.icon className="size-5" />
+              </span>
+              <div>
+                <h3 className="font-display text-sm font-bold">{f.title}</h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">{f.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-center pt-1">
+          <Link
+            to="/study-guide-generator"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            <CalendarDays className="size-4" /> Try the study plan generator
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
 
