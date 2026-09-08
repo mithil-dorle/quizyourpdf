@@ -431,6 +431,7 @@ function Index() {
             )}
           </Button>
 
+          <FeaturesMini />
           <HowItWorksMini />
           <TestimonialsMini />
           <FeedbackForm className="mt-2" />
