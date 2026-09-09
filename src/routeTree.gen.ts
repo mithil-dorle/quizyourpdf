@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdsDottxtRouteImport } from './routes/ads[.]txt'
+import { Route as DescriptiveAnswerCheckRouteImport } from './routes/descriptive-answer-check'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -25,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdsDottxtRoute = AdsDottxtRouteImport.update({
   id: '/ads.txt',
   path: '/ads.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DescriptiveAnswerCheckRoute = DescriptiveAnswerCheckRouteImport.update({
+  id: '/descriptive-answer-check',
+  path: '/descriptive-answer-check',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -56,6 +62,7 @@ const TermsRoute = TermsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ads.txt': typeof AdsDottxtRoute
+  '/descriptive-answer-check': typeof DescriptiveAnswerCheckRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ads.txt': typeof AdsDottxtRoute
+  '/descriptive-answer-check': typeof DescriptiveAnswerCheckRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ads.txt': typeof AdsDottxtRoute
+  '/descriptive-answer-check': typeof DescriptiveAnswerCheckRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ads.txt'
+    | '/descriptive-answer-check'
     | '/faq'
     | '/how-it-works'
     | '/sitemap.xml'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ads.txt'
+    | '/descriptive-answer-check'
     | '/faq'
     | '/how-it-works'
     | '/sitemap.xml'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/ads.txt'
+    | '/descriptive-answer-check'
     | '/faq'
     | '/how-it-works'
     | '/sitemap.xml'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdsDottxtRoute: typeof AdsDottxtRoute
+  DescriptiveAnswerCheckRoute: typeof DescriptiveAnswerCheckRoute
   FaqRoute: typeof FaqRoute
   HowItWorksRoute: typeof HowItWorksRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/ads.txt'
       fullPath: '/ads.txt'
       preLoaderRoute: typeof AdsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/descriptive-answer-check': {
+      id: '/descriptive-answer-check'
+      path: '/descriptive-answer-check'
+      fullPath: '/descriptive-answer-check'
+      preLoaderRoute: typeof DescriptiveAnswerCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdsDottxtRoute: AdsDottxtRoute,
+  DescriptiveAnswerCheckRoute: DescriptiveAnswerCheckRoute,
   FaqRoute: FaqRoute,
   HowItWorksRoute: HowItWorksRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
