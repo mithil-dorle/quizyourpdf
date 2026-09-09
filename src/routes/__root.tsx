@@ -23,6 +23,12 @@ function Footer() {
             Study guide generator
           </Link>
           <Link
+            to="/descriptive-answer-check"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Answer checker
+          </Link>
+          <Link
             to="/how-it-works"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
