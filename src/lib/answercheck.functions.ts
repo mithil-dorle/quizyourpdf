@@ -38,7 +38,7 @@ export type AnswerCheckResult = z.infer<typeof ResultSchema> & {
   wordCount: number;
   wordLimit: number;
   overLimit: boolean;
-  timeTakenSeconds?: number;
+  timeTakenSeconds?: number | undefined;
 };
 
 function countWords(text: string) {
