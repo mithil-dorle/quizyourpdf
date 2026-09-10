@@ -143,7 +143,7 @@ function WeightRadar({ weights }: { weights: Weights }) {
     const onRight = x > cx + 2;
     const onLeft = x < cx - 2;
     const dx = onRight ? 5 : onLeft ? -5 : 0;
-    const anchor = onRight ? "start" : onLeft ? "end" : "middle";
+    const anchor: "start" | "middle" | "end" = onRight ? "start" : onLeft ? "end" : "middle";
     return { x: x + dx, y, anchor };
   }
 
