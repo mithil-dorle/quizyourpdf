@@ -10,6 +10,8 @@ import {
   Loader2,
   PenLine,
   RotateCcw,
+  SlidersHorizontal,
+  ChevronDown,
   Sparkles,
   Target,
   Timer,
@@ -89,6 +91,80 @@ function fmt(seconds: number) {
 const inputClass =
   "w-full rounded-xl border border-border bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary/60";
 
+type Weights = {
+  accuracy: number;
+  keyword: number;
+  depth: number;
+  structure: number;
+  conciseness: number;
+};
+
+const DEFAULT_WEIGHTS: Weights = {
+  accuracy: 40,
+  keyword: 25,
+  depth: 20,
+  structure: 10,
+  conciseness: 5,
+};
+
+const WEIGHT_META: { key: keyof Weights; label: string; color: string }[] = [
+  { key: "accuracy", label: "Factual accuracy", color: "var(--primary)" },
+  { key: "keyword", label: "Concept & keyword match", color: "var(--chart-2)" },
+  { key: "depth", label: "Analytical depth", color: "var(--chart-3)" },
+  { key: "structure", label: "Structure & flow", color: "var(--chart-4)" },
+  { key: "conciseness", label: "Conciseness", color: "var(--chart-5)" },
+];
+
+function radarPoint(i: number, total: number, value: number, max: number, r: number, cx: number, cy: number) {
+  const angle = (Math.PI * 2 * i) / total - Math.PI / 2;
+  const radius = (Math.max(0, Math.min(max, value)) / max) * r;
+  return [cx + radius * Math.cos(angle), cy + radius * Math.sin(angle)] as const;
+}
+
+function WeightRadar({ weights }: { weights: Weights }) {
+  const size = 220;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 78;
+  const n = WEIGHT_META.length;
+  const ring = (frac: number) =>
+    WEIGHT_META.map((_, i) => radarPoint(i, n, frac, 1, r, cx, cy).join(",")).join(" ");
+  const poly = WEIGHT_META.map((m, i) => radarPoint(i, n, weights[m.key], 100, r, cx, cy).join(",")).join(" ");
+
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} className="mx-auto w-full max-w-[220px]">
+      {[0.25, 0.5, 0.75, 1].map((f) => (
+        <polygon key={f} points={ring(f)} fill="none" stroke="var(--border)" strokeWidth="1" />
+      ))}
+      {WEIGHT_META.map((m, i) => {
+        const [x, y] = radarPoint(i, n, 1, 1, r, cx, cy);
+        const [lx, ly] = radarPoint(i, n, 1, 1, r + 16, cx, cy);
+        return (
+          <g key={m.key}>
+            <line x1={cx} y1={cy} x2={x} y2={y} stroke="var(--border)" strokeWidth="1" />
+            <text
+              x={lx}
+              y={ly}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-muted-foreground"
+              fontSize="9"
+              fontWeight="600"
+            >
+              {m.label.split(" ")[0]}
+            </text>
+          </g>
+        );
+      })}
+      <polygon points={poly} fill="oklch(0.88 0.24 128 / 25%)" stroke="var(--primary)" strokeWidth="2" />
+      {WEIGHT_META.map((m, i) => {
+        const [x, y] = radarPoint(i, n, weights[m.key], 100, r, cx, cy);
+        return <circle key={m.key} cx={x} cy={y} r="3.5" fill={m.color} />;
+      })}
+    </svg>
+  );
+}
+
 function DescriptiveAnswerCheckPage() {
   const [mode, setMode] = useState<Mode>("check");
 
@@ -107,6 +183,9 @@ function DescriptiveAnswerCheckPage() {
   const [remaining, setRemaining] = useState(0);
   const [startedAt, setStartedAt] = useState(0);
   const [pasteBlocks, setPasteBlocks] = useState(0);
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [weights, setWeights] = useState<Weights>(DEFAULT_WEIGHTS);
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnswerCheckResult | null>(null);
@@ -316,6 +395,76 @@ function DescriptiveAnswerCheckPage() {
                     onChange={(e) => setMaxTime(e.target.value)}
                     className={inputClass}
                   />
+                </div>
+              )}
+            </div>
+
+            {/* advanced evaluation settings */}
+            <div className="mt-4 rounded-2xl border border-border bg-background/40">
+              <button
+                type="button"
+                onClick={() => setShowAdvanced((s) => !s)}
+                className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left"
+              >
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <SlidersHorizontal className="h-4 w-4 text-primary" />
+                  Advanced evaluation settings
+                </span>
+                <ChevronDown
+                  className={`h-4 w-4 text-muted-foreground transition-transform ${showAdvanced ? "rotate-180" : ""}`}
+                />
+              </button>
+              {showAdvanced && (
+                <div className="grid gap-4 border-t border-border px-4 py-4 sm:grid-cols-2">
+                  <div className="space-y-3">
+                    {WEIGHT_META.map((m) => (
+                      <div key={m.key}>
+                        <div className="mb-1 flex items-center justify-between text-xs">
+                          <span className="inline-flex items-center gap-1.5 font-semibold text-foreground">
+                            <span className="h-2 w-2 rounded-full" style={{ background: m.color }} />
+                            {m.label}
+                          </span>
+                          <span className="font-display font-bold text-primary">{weights[m.key]}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0}
+                          max={100}
+                          step={5}
+                          value={weights[m.key]}
+                          onChange={(e) =>
+                            setWeights((w) => ({ ...w, [m.key]: Number(e.target.value) }))
+                          }
+                          className="w-full accent-[oklch(0.88_0.24_128)]"
+                        />
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                      <span
+                        className={`text-xs font-semibold ${
+                          Object.values(weights).reduce((a, b) => a + b, 0) === 100
+                            ? "text-primary"
+                            : "text-warning"
+                        }`}
+                      >
+                        total: {Object.values(weights).reduce((a, b) => a + b, 0)}%
+                        {Object.values(weights).reduce((a, b) => a + b, 0) !== 100 && " (aim for 100%)"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setWeights(DEFAULT_WEIGHTS)}
+                        className="text-xs font-semibold text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+                      >
+                        reset defaults
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center justify-center">
+                    <WeightRadar weights={weights} />
+                    <p className="mt-1 text-center text-[11px] text-muted-foreground">
+                      live weight radar — tweaks apply to your next check
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
