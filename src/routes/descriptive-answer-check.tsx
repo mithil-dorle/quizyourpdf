@@ -122,43 +122,59 @@ function radarPoint(i: number, total: number, value: number, max: number, r: num
 }
 
 function WeightRadar({ weights }: { weights: Weights }) {
-  const size = 220;
+  const size = 280;
   const cx = size / 2;
   const cy = size / 2;
-  const r = 78;
+  const r = 100;
+  const labelR = 128;
   const n = WEIGHT_META.length;
+
+  // Zoom the radar so small weights don't all bunch in the centre.
+  // The scale tops out at the highest current weight, but never below 50.
+  const maxWeight = Math.max(...Object.values(weights));
+  const dataMax = Math.max(50, maxWeight);
+
   const ring = (frac: number) =>
-    WEIGHT_META.map((_, i) => radarPoint(i, n, frac, 1, r, cx, cy).join(",")).join(" ");
-  const poly = WEIGHT_META.map((m, i) => radarPoint(i, n, weights[m.key], 100, r, cx, cy).join(",")).join(" ");
+    WEIGHT_META.map((_, i) => radarPoint(i, n, frac * dataMax, dataMax, r, cx, cy).join(",")).join(" ");
+  const poly = WEIGHT_META.map((m, i) => radarPoint(i, n, weights[m.key], dataMax, r, cx, cy).join(",")).join(" ");
+
+  function labelPos(i: number) {
+    const [x, y] = radarPoint(i, n, 1, 1, labelR, cx, cy);
+    const onRight = x > cx + 2;
+    const onLeft = x < cx - 2;
+    const dx = onRight ? 5 : onLeft ? -5 : 0;
+    const anchor: "start" | "middle" | "end" = onRight ? "start" : onLeft ? "end" : "middle";
+    return { x: x + dx, y, anchor };
+  }
 
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="mx-auto w-full max-w-[220px]">
+    <svg viewBox={`0 0 ${size} ${size}`} className="mx-auto w-full max-w-[280px] overflow-visible">
       {[0.25, 0.5, 0.75, 1].map((f) => (
         <polygon key={f} points={ring(f)} fill="none" stroke="var(--border)" strokeWidth="1" />
       ))}
       {WEIGHT_META.map((m, i) => {
         const [x, y] = radarPoint(i, n, 1, 1, r, cx, cy);
-        const [lx, ly] = radarPoint(i, n, 1, 1, r + 16, cx, cy);
+        const { x: lx, y: ly, anchor } = labelPos(i);
         return (
           <g key={m.key}>
             <line x1={cx} y1={cy} x2={x} y2={y} stroke="var(--border)" strokeWidth="1" />
             <text
               x={lx}
               y={ly}
-              textAnchor="middle"
-              dominantBaseline="middle"
+              textAnchor={anchor}
+              dominantBaseline="central"
               className="fill-muted-foreground"
               fontSize="9"
               fontWeight="600"
             >
-              {m.label.split(" ")[0]}
+              {m.label}
             </text>
           </g>
         );
       })}
       <polygon points={poly} fill="oklch(0.88 0.24 128 / 25%)" stroke="var(--primary)" strokeWidth="2" />
       {WEIGHT_META.map((m, i) => {
-        const [x, y] = radarPoint(i, n, weights[m.key], 100, r, cx, cy);
+        const [x, y] = radarPoint(i, n, weights[m.key], dataMax, r, cx, cy);
         return <circle key={m.key} cx={x} cy={y} r="3.5" fill={m.color} />;
       })}
     </svg>
