@@ -10,6 +10,8 @@ import {
   Loader2,
   PenLine,
   RotateCcw,
+  SlidersHorizontal,
+  ChevronDown,
   Sparkles,
   Target,
   Timer,
