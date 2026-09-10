@@ -184,6 +184,9 @@ function DescriptiveAnswerCheckPage() {
   const [startedAt, setStartedAt] = useState(0);
   const [pasteBlocks, setPasteBlocks] = useState(0);
 
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [weights, setWeights] = useState<Weights>(DEFAULT_WEIGHTS);
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnswerCheckResult | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
