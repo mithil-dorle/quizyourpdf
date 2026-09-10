@@ -399,6 +399,76 @@ function DescriptiveAnswerCheckPage() {
               )}
             </div>
 
+            {/* advanced evaluation settings */}
+            <div className="mt-4 rounded-2xl border border-border bg-background/40">
+              <button
+                type="button"
+                onClick={() => setShowAdvanced((s) => !s)}
+                className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left"
+              >
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <SlidersHorizontal className="h-4 w-4 text-primary" />
+                  Advanced evaluation settings
+                </span>
+                <ChevronDown
+                  className={`h-4 w-4 text-muted-foreground transition-transform ${showAdvanced ? "rotate-180" : ""}`}
+                />
+              </button>
+              {showAdvanced && (
+                <div className="grid gap-4 border-t border-border px-4 py-4 sm:grid-cols-2">
+                  <div className="space-y-3">
+                    {WEIGHT_META.map((m) => (
+                      <div key={m.key}>
+                        <div className="mb-1 flex items-center justify-between text-xs">
+                          <span className="inline-flex items-center gap-1.5 font-semibold text-foreground">
+                            <span className="h-2 w-2 rounded-full" style={{ background: m.color }} />
+                            {m.label}
+                          </span>
+                          <span className="font-display font-bold text-primary">{weights[m.key]}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0}
+                          max={100}
+                          step={5}
+                          value={weights[m.key]}
+                          onChange={(e) =>
+                            setWeights((w) => ({ ...w, [m.key]: Number(e.target.value) }))
+                          }
+                          className="w-full accent-[oklch(0.88_0.24_128)]"
+                        />
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                      <span
+                        className={`text-xs font-semibold ${
+                          Object.values(weights).reduce((a, b) => a + b, 0) === 100
+                            ? "text-primary"
+                            : "text-warning"
+                        }`}
+                      >
+                        total: {Object.values(weights).reduce((a, b) => a + b, 0)}%
+                        {Object.values(weights).reduce((a, b) => a + b, 0) !== 100 && " (aim for 100%)"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setWeights(DEFAULT_WEIGHTS)}
+                        className="text-xs font-semibold text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+                      >
+                        reset defaults
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center justify-center">
+                    <WeightRadar weights={weights} />
+                    <p className="mt-1 text-center text-[11px] text-muted-foreground">
+                      live weight radar — tweaks apply to your next check
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {mode === "check" ? (
               <>
                 <div className="mt-4 mb-1.5 flex items-center justify-between">
