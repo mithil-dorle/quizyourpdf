@@ -91,6 +91,80 @@ function fmt(seconds: number) {
 const inputClass =
   "w-full rounded-xl border border-border bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary/60";
 
+type Weights = {
+  accuracy: number;
+  keyword: number;
+  depth: number;
+  structure: number;
+  conciseness: number;
+};
+
+const DEFAULT_WEIGHTS: Weights = {
+  accuracy: 40,
+  keyword: 25,
+  depth: 20,
+  structure: 10,
+  conciseness: 5,
+};
+
+const WEIGHT_META: { key: keyof Weights; label: string; color: string }[] = [
+  { key: "accuracy", label: "Factual accuracy", color: "var(--primary)" },
+  { key: "keyword", label: "Concept & keyword match", color: "var(--chart-2)" },
+  { key: "depth", label: "Analytical depth", color: "var(--chart-3)" },
+  { key: "structure", label: "Structure & flow", color: "var(--chart-4)" },
+  { key: "conciseness", label: "Conciseness", color: "var(--chart-5)" },
+];
+
+function radarPoint(i: number, total: number, value: number, max: number, r: number, cx: number, cy: number) {
+  const angle = (Math.PI * 2 * i) / total - Math.PI / 2;
+  const radius = (Math.max(0, Math.min(max, value)) / max) * r;
+  return [cx + radius * Math.cos(angle), cy + radius * Math.sin(angle)] as const;
+}
+
+function WeightRadar({ weights }: { weights: Weights }) {
+  const size = 220;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 78;
+  const n = WEIGHT_META.length;
+  const ring = (frac: number) =>
+    WEIGHT_META.map((_, i) => radarPoint(i, n, frac, 1, r, cx, cy).join(",")).join(" ");
+  const poly = WEIGHT_META.map((m, i) => radarPoint(i, n, weights[m.key], 100, r, cx, cy).join(",")).join(" ");
+
+  return (
+    <svg viewBox={`0 0 ${size} ${size}`} className="mx-auto w-full max-w-[220px]">
+      {[0.25, 0.5, 0.75, 1].map((f) => (
+        <polygon key={f} points={ring(f)} fill="none" stroke="var(--border)" strokeWidth="1" />
+      ))}
+      {WEIGHT_META.map((m, i) => {
+        const [x, y] = radarPoint(i, n, 1, 1, r, cx, cy);
+        const [lx, ly] = radarPoint(i, n, 1, 1, r + 16, cx, cy);
+        return (
+          <g key={m.key}>
+            <line x1={cx} y1={cy} x2={x} y2={y} stroke="var(--border)" strokeWidth="1" />
+            <text
+              x={lx}
+              y={ly}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-muted-foreground"
+              fontSize="9"
+              fontWeight="600"
+            >
+              {m.label.split(" ")[0]}
+            </text>
+          </g>
+        );
+      })}
+      <polygon points={poly} fill="oklch(0.88 0.24 128 / 25%)" stroke="var(--primary)" strokeWidth="2" />
+      {WEIGHT_META.map((m, i) => {
+        const [x, y] = radarPoint(i, n, weights[m.key], 100, r, cx, cy);
+        return <circle key={m.key} cx={x} cy={y} r="3.5" fill={m.color} />;
+      })}
+    </svg>
+  );
+}
+
 function DescriptiveAnswerCheckPage() {
   const [mode, setMode] = useState<Mode>("check");
 
