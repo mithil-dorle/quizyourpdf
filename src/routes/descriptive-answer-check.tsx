@@ -210,6 +210,38 @@ function DescriptiveAnswerCheckPage() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [weights, setWeights] = useState<Weights>(DEFAULT_WEIGHTS);
 
+  // Change one weight and auto-scale the others so the total stays 100%.
+  const updateWeight = (key: keyof Weights, rawValue: number) => {
+    const value = Math.max(0, Math.min(100, rawValue));
+    setWeights((w) => {
+      const others = WEIGHT_META.map((m) => m.key).filter((k) => k !== key);
+      const otherSum = others.reduce((a, k) => a + w[k], 0);
+      const remaining = 100 - value;
+      const next = { ...w, [key]: value };
+      if (otherSum <= 0) {
+        // Other sliders are all 0 — split the remainder evenly.
+        const even = Math.floor(remaining / others.length);
+        let leftover = remaining - even * others.length;
+        for (const k of others) {
+          next[k] = even + (leftover > 0 ? 1 : 0);
+          leftover -= 1;
+        }
+        return next;
+      }
+      // Proportional rescale with rounding, drift fixed on the largest other.
+      let drift = remaining;
+      for (const k of others) {
+        next[k] = Math.round((w[k] / otherSum) * remaining);
+        drift -= next[k];
+      }
+      if (drift !== 0) {
+        const biggest = others.reduce((a, b) => (next[a] >= next[b] ? a : b));
+        next[biggest] = Math.max(0, next[biggest] + drift);
+      }
+      return next;
+    });
+  };
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnswerCheckResult | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
