@@ -107,12 +107,12 @@ const DEFAULT_WEIGHTS: Weights = {
   conciseness: 5,
 };
 
-const WEIGHT_META: { key: keyof Weights; label: string; color: string }[] = [
-  { key: "accuracy", label: "Factual accuracy", color: "var(--primary)" },
-  { key: "keyword", label: "Concept & keyword match", color: "var(--chart-2)" },
-  { key: "depth", label: "Analytical depth", color: "var(--chart-3)" },
-  { key: "structure", label: "Structure & flow", color: "var(--chart-4)" },
-  { key: "conciseness", label: "Conciseness", color: "var(--chart-5)" },
+const WEIGHT_META: { key: keyof Weights; label: string; radarLabel: string[]; color: string }[] = [
+  { key: "accuracy", label: "Factual accuracy", radarLabel: ["Factual", "accuracy"], color: "var(--primary)" },
+  { key: "keyword", label: "Concept & keyword match", radarLabel: ["Concept &", "keyword match"], color: "var(--chart-2)" },
+  { key: "depth", label: "Analytical depth", radarLabel: ["Analytical", "depth"], color: "var(--chart-3)" },
+  { key: "structure", label: "Structure & flow", radarLabel: ["Structure", "& flow"], color: "var(--chart-4)" },
+  { key: "conciseness", label: "Conciseness", radarLabel: ["Conciseness"], color: "var(--chart-5)" },
 ];
 
 function radarPoint(i: number, total: number, value: number, max: number, r: number, cx: number, cy: number) {
@@ -122,16 +122,13 @@ function radarPoint(i: number, total: number, value: number, max: number, r: num
 }
 
 function WeightRadar({ weights }: { weights: Weights }) {
-  const size = 280;
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = 90;
-  const labelR = 104;
+  const width = 360;
+  const height = 320;
+  const cx = width / 2;
+  const cy = 154;
+  const r = 108;
+  const labelR = 135;
   const n = WEIGHT_META.length;
-  // Extra padding inside the viewBox so side/top labels never clip.
-  const padX = 86;
-  const padTop = 16;
-  const padBottom = 8;
 
   // Zoom the radar so small weights don't all bunch in the centre.
   // The scale tops out at the highest current weight, but never below 50.
@@ -153,8 +150,10 @@ function WeightRadar({ weights }: { weights: Weights }) {
 
   return (
     <svg
-      viewBox={`${-padX} ${-padTop} ${size + padX * 2} ${size + padTop + padBottom}`}
-      className="mx-auto w-full max-w-[360px]"
+      viewBox={`0 0 ${width} ${height}`}
+      className="mx-auto w-full max-w-[430px]"
+      role="img"
+      aria-label="Live evaluation weight radar"
     >
       {[0.25, 0.5, 0.75, 1].map((f) => (
         <polygon key={f} points={ring(f)} fill="none" stroke="var(--border)" strokeWidth="1" />
@@ -171,10 +170,18 @@ function WeightRadar({ weights }: { weights: Weights }) {
               textAnchor={anchor}
               dominantBaseline="central"
               className="fill-muted-foreground"
-              fontSize="9"
+               fontSize="10"
               fontWeight="600"
             >
-              {m.label}
+               {m.radarLabel.map((line, lineIndex) => (
+                 <tspan
+                   key={line}
+                   x={lx}
+                   dy={lineIndex === 0 ? (m.radarLabel.length > 1 ? -5 : 0) : 12}
+                 >
+                   {line}
+                 </tspan>
+               ))}
             </text>
           </g>
         );
@@ -505,7 +512,7 @@ function DescriptiveAnswerCheckPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center justify-center">
+                   <div className="flex min-w-0 flex-col items-center justify-center">
                     <WeightRadar weights={weights} />
                     <p className="mt-1 text-center text-[11px] text-muted-foreground">
                       live weight radar — tweaks apply to your next check
