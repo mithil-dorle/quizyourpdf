@@ -493,15 +493,8 @@ function DescriptiveAnswerCheckPage() {
                       </div>
                     ))}
                     <div className="flex items-center justify-between gap-2 pt-1">
-                      <span
-                        className={`text-xs font-semibold ${
-                          Object.values(weights).reduce((a, b) => a + b, 0) === 100
-                            ? "text-primary"
-                            : "text-warning"
-                        }`}
-                      >
-                        total: {Object.values(weights).reduce((a, b) => a + b, 0)}%
-                        {Object.values(weights).reduce((a, b) => a + b, 0) !== 100 && " (aim for 100%)"}
+                      <span className="text-xs font-semibold text-primary">
+                        total: {Object.values(weights).reduce((a, b) => a + b, 0)}% — auto-balanced
                       </span>
                       <button
                         type="button"
