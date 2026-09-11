@@ -125,9 +125,13 @@ function WeightRadar({ weights }: { weights: Weights }) {
   const size = 280;
   const cx = size / 2;
   const cy = size / 2;
-  const r = 100;
-  const labelR = 128;
+  const r = 90;
+  const labelR = 104;
   const n = WEIGHT_META.length;
+  // Extra padding inside the viewBox so side/top labels never clip.
+  const padX = 86;
+  const padTop = 16;
+  const padBottom = 8;
 
   // Zoom the radar so small weights don't all bunch in the centre.
   // The scale tops out at the highest current weight, but never below 50.
@@ -142,13 +146,16 @@ function WeightRadar({ weights }: { weights: Weights }) {
     const [x, y] = radarPoint(i, n, 1, 1, labelR, cx, cy);
     const onRight = x > cx + 2;
     const onLeft = x < cx - 2;
-    const dx = onRight ? 5 : onLeft ? -5 : 0;
+    const dx = onRight ? 4 : onLeft ? -4 : 0;
     const anchor: "start" | "middle" | "end" = onRight ? "start" : onLeft ? "end" : "middle";
     return { x: x + dx, y, anchor };
   }
 
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} className="mx-auto w-full max-w-[280px] overflow-visible">
+    <svg
+      viewBox={`${-padX} ${-padTop} ${size + padX * 2} ${size + padTop + padBottom}`}
+      className="mx-auto w-full max-w-[360px]"
+    >
       {[0.25, 0.5, 0.75, 1].map((f) => (
         <polygon key={f} points={ring(f)} fill="none" stroke="var(--border)" strokeWidth="1" />
       ))}
@@ -202,6 +209,38 @@ function DescriptiveAnswerCheckPage() {
 
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [weights, setWeights] = useState<Weights>(DEFAULT_WEIGHTS);
+
+  // Change one weight and auto-scale the others so the total stays 100%.
+  const updateWeight = (key: keyof Weights, rawValue: number) => {
+    const value = Math.max(0, Math.min(100, rawValue));
+    setWeights((w) => {
+      const others = WEIGHT_META.map((m) => m.key).filter((k) => k !== key);
+      const otherSum = others.reduce((a, k) => a + w[k], 0);
+      const remaining = 100 - value;
+      const next = { ...w, [key]: value };
+      if (otherSum <= 0) {
+        // Other sliders are all 0 — split the remainder evenly.
+        const even = Math.floor(remaining / others.length);
+        let leftover = remaining - even * others.length;
+        for (const k of others) {
+          next[k] = even + (leftover > 0 ? 1 : 0);
+          leftover -= 1;
+        }
+        return next;
+      }
+      // Proportional rescale with rounding, drift fixed on the largest other.
+      let drift = remaining;
+      for (const k of others) {
+        next[k] = Math.round((w[k] / otherSum) * remaining);
+        drift -= next[k];
+      }
+      if (drift !== 0) {
+        const biggest = others.reduce((a, b) => (next[a] >= next[b] ? a : b));
+        next[biggest] = Math.max(0, next[biggest] + drift);
+      }
+      return next;
+    });
+  };
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnswerCheckResult | null>(null);
@@ -448,23 +487,14 @@ function DescriptiveAnswerCheckPage() {
                           max={100}
                           step={5}
                           value={weights[m.key]}
-                          onChange={(e) =>
-                            setWeights((w) => ({ ...w, [m.key]: Number(e.target.value) }))
-                          }
+                          onChange={(e) => updateWeight(m.key, Number(e.target.value))}
                           className="w-full accent-[oklch(0.88_0.24_128)]"
                         />
                       </div>
                     ))}
                     <div className="flex items-center justify-between gap-2 pt-1">
-                      <span
-                        className={`text-xs font-semibold ${
-                          Object.values(weights).reduce((a, b) => a + b, 0) === 100
-                            ? "text-primary"
-                            : "text-warning"
-                        }`}
-                      >
-                        total: {Object.values(weights).reduce((a, b) => a + b, 0)}%
-                        {Object.values(weights).reduce((a, b) => a + b, 0) !== 100 && " (aim for 100%)"}
+                      <span className="text-xs font-semibold text-primary">
+                        total: {Object.values(weights).reduce((a, b) => a + b, 0)}% — auto-balanced
                       </span>
                       <button
                         type="button"
