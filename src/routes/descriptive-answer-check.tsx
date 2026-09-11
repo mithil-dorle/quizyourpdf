@@ -487,9 +487,7 @@ function DescriptiveAnswerCheckPage() {
                           max={100}
                           step={5}
                           value={weights[m.key]}
-                          onChange={(e) =>
-                            setWeights((w) => ({ ...w, [m.key]: Number(e.target.value) }))
-                          }
+                          onChange={(e) => updateWeight(m.key, Number(e.target.value))}
                           className="w-full accent-[oklch(0.88_0.24_128)]"
                         />
                       </div>
