@@ -115,6 +115,39 @@ const WEIGHT_META: { key: keyof Weights; label: string; color: string }[] = [
   { key: "conciseness", label: "Conciseness", color: "var(--chart-5)" },
 ];
 
+const MARKING_GUIDE = [
+  {
+    title: "Factual accuracy",
+    weight: "40%",
+    explanation: "Checks whether claims, definitions, dates, formulas, and conclusions are correct.",
+    example: "Writing that photosynthesis uses light to convert carbon dioxide and water into glucose earns credit; saying it produces carbon dioxide loses it.",
+  },
+  {
+    title: "Concept & keyword match",
+    weight: "25%",
+    explanation: "Looks for the essential subject terms and concepts expected in a strong answer.",
+    example: "For inflation, relevant ideas may include purchasing power, demand, supply costs, interest rates, and the consumer price index.",
+  },
+  {
+    title: "Analytical depth",
+    weight: "20%",
+    explanation: "Rewards explanation, connections, evidence, cause and effect, and justified conclusions—not just recalled facts.",
+    example: "Instead of saying a policy failed, explain why it failed, what evidence supports that view, and which limitation mattered most.",
+  },
+  {
+    title: "Structure & flow",
+    weight: "10%",
+    explanation: "Checks whether ideas follow a clear order with focused paragraphs and logical transitions.",
+    example: "A clear introduction, evidence-led body paragraphs, and a conclusion that answers the question score better than disconnected points.",
+  },
+  {
+    title: "Conciseness",
+    weight: "5%",
+    explanation: "Rewards direct, relevant writing that stays near the word limit without repetition or filler.",
+    example: "One precise sentence explaining a cause is stronger than three sentences repeating the same point in different words.",
+  },
+];
+
 function radarPoint(i: number, total: number, value: number, max: number, r: number, cx: number, cy: number) {
   const angle = (Math.PI * 2 * i) / total - Math.PI / 2;
   const radius = (Math.max(0, Math.min(max, value)) / max) * r;
@@ -473,6 +506,13 @@ function DescriptiveAnswerCheckPage() {
                         reset defaults
                       </button>
                     </div>
+                    <a
+                      href="#marking-guide"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary underline-offset-2 hover:underline"
+                    >
+                      <BookOpenCheck className="h-3.5 w-3.5" />
+                      What do these weights mean?
+                    </a>
                   </div>
                   <div className="flex flex-col items-center justify-center">
                     <WeightRadar weights={weights} />
@@ -766,6 +806,39 @@ function DescriptiveAnswerCheckPage() {
                   <h3 className="mt-2 text-sm font-bold text-foreground">{f.title}</h3>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{f.body}</p>
                 </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {!writing && (
+          <section id="marking-guide" className="mt-10 scroll-mt-6">
+            <div className="mb-4 text-center">
+              <h2 className="text-lg font-bold">marking guide</h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                See what each evaluation weight looks for in your answer.
+              </p>
+            </div>
+            <div className="space-y-2">
+              {MARKING_GUIDE.map((item) => (
+                <details key={item.title} className="group surface-card overflow-hidden">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 text-sm font-bold text-foreground [&::-webkit-details-marker]:hidden">
+                    <span>{item.title}</span>
+                    <span className="flex shrink-0 items-center gap-2">
+                      <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs text-primary">
+                        {item.weight}
+                      </span>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
+                    </span>
+                  </summary>
+                  <div className="border-t border-border px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+                    <p>{item.explanation}</p>
+                    <p className="mt-2 rounded-lg bg-background/60 p-3 text-xs">
+                      <span className="font-bold text-foreground">Example: </span>
+                      {item.example}
+                    </p>
+                  </div>
+                </details>
               ))}
             </div>
           </section>
