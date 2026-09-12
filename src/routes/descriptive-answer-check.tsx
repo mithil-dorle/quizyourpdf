@@ -125,13 +125,8 @@ function WeightRadar({ weights }: { weights: Weights }) {
   const size = 280;
   const cx = size / 2;
   const cy = size / 2;
-  const r = 90;
-  const labelR = 104;
+  const r = 125;
   const n = WEIGHT_META.length;
-  // Extra padding inside the viewBox so side/top labels never clip.
-  const padX = 86;
-  const padTop = 16;
-  const padBottom = 8;
 
   // Zoom the radar so small weights don't all bunch in the centre.
   // The scale tops out at the highest current weight, but never below 50.
@@ -142,41 +137,15 @@ function WeightRadar({ weights }: { weights: Weights }) {
     WEIGHT_META.map((_, i) => radarPoint(i, n, frac * dataMax, dataMax, r, cx, cy).join(",")).join(" ");
   const poly = WEIGHT_META.map((m, i) => radarPoint(i, n, weights[m.key], dataMax, r, cx, cy).join(",")).join(" ");
 
-  function labelPos(i: number) {
-    const [x, y] = radarPoint(i, n, 1, 1, labelR, cx, cy);
-    const onRight = x > cx + 2;
-    const onLeft = x < cx - 2;
-    const dx = onRight ? 4 : onLeft ? -4 : 0;
-    const anchor: "start" | "middle" | "end" = onRight ? "start" : onLeft ? "end" : "middle";
-    return { x: x + dx, y, anchor };
-  }
-
   return (
-    <svg
-      viewBox={`${-padX} ${-padTop} ${size + padX * 2} ${size + padTop + padBottom}`}
-      className="mx-auto w-full max-w-[360px]"
-    >
+    <svg viewBox={`0 0 ${size} ${size}`} className="mx-auto w-full max-w-[280px]">
       {[0.25, 0.5, 0.75, 1].map((f) => (
         <polygon key={f} points={ring(f)} fill="none" stroke="var(--border)" strokeWidth="1" />
       ))}
       {WEIGHT_META.map((m, i) => {
         const [x, y] = radarPoint(i, n, 1, 1, r, cx, cy);
-        const { x: lx, y: ly, anchor } = labelPos(i);
         return (
-          <g key={m.key}>
-            <line x1={cx} y1={cy} x2={x} y2={y} stroke="var(--border)" strokeWidth="1" />
-            <text
-              x={lx}
-              y={ly}
-              textAnchor={anchor}
-              dominantBaseline="central"
-              className="fill-muted-foreground"
-              fontSize="9"
-              fontWeight="600"
-            >
-              {m.label}
-            </text>
-          </g>
+          <line key={m.key} x1={cx} y1={cy} x2={x} y2={y} stroke="var(--border)" strokeWidth="1" />
         );
       })}
       <polygon points={poly} fill="oklch(0.88 0.24 128 / 25%)" stroke="var(--primary)" strokeWidth="2" />
