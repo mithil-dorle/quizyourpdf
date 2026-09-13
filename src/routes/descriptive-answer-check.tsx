@@ -16,6 +16,7 @@ import {
   Target,
   Timer,
   Type,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { checkDescriptiveAnswer, type AnswerCheckResult } from "@/lib/answercheck.functions";
@@ -338,22 +339,31 @@ function DescriptiveAnswerCheckPage() {
   return (
     <main className="min-h-screen px-4 pb-16 pt-5 sm:px-6 sm:pt-8">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-6 flex items-center justify-between gap-3">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Back to app</span>
+        <header className="mb-6 flex items-center justify-between gap-3 sm:mb-10">
+          <Link to="/" className="flex min-w-0 items-center gap-2">
+            <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground sm:size-10 sm:rounded-2xl">
+              <Zap className="size-4 sm:size-5" />
+            </span>
+            <span className="truncate font-display text-lg font-bold sm:text-xl">QuizLab</span>
           </Link>
-          {!writing && (
-            <ShareDialog
-              url={URL}
-              title={TITLE}
-              text="Get your descriptive answers marked by AI 📝"
-              label="Share"
-            />
-          )}
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            {!writing && (
+              <ShareDialog
+                url={URL}
+                title={TITLE}
+                text="Get your descriptive answers marked by AI 📝"
+                label="Share"
+              />
+            )}
+            <Link
+              to="/"
+              aria-label="Back to app"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:border-0 sm:px-0 sm:py-0 sm:text-sm"
+            >
+              <ArrowLeft className="size-4" />
+              <span className="hidden sm:inline">Back to app</span>
+            </Link>
+          </div>
         </header>
 
         {!writing && (
