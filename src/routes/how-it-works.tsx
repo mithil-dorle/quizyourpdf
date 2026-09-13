@@ -114,10 +114,10 @@ function HowItWorksPage() {
 
       <section className="space-y-8">
         <div className="space-y-3 text-center">
-          <h1 className="font-display text-4xl font-bold leading-[1.05] sm:text-5xl">
+          <h1 className="type-page-title">
             how it <span className="text-hype">works</span>
           </h1>
-          <p className="mx-auto max-w-md text-muted-foreground">
+          <p className="type-lead mx-auto max-w-md">
             Your notes → AI quiz → game mode studying. No cap.
           </p>
         </div>
@@ -136,17 +136,17 @@ function HowItWorksPage() {
                   Step {i + 1}
                 </span>
               </div>
-              <h2 className="font-display text-lg font-bold">{step.title}</h2>
-              <p className="text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+              <h2 className="type-card-title">{step.title}</h2>
+              <p className="type-body">{step.body}</p>
             </div>
           ))}
         </div>
 
         <div className="space-y-3 pt-4 text-center">
-          <h2 className="font-display text-3xl font-bold leading-[1.05]">
+          <h2 className="type-section-title">
             study plan <span className="text-hype">generator</span>
           </h2>
-          <p className="mx-auto max-w-md text-muted-foreground">
+          <p className="type-body mx-auto max-w-md">
             Not sure where to start? Let the AI build your whole exam schedule.
           </p>
         </div>
@@ -165,8 +165,8 @@ function HowItWorksPage() {
                   Step {i + 1}
                 </span>
               </div>
-              <h3 className="font-display text-lg font-bold">{step.title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{step.body}</p>
+              <h3 className="type-card-title">{step.title}</h3>
+              <p className="type-body">{step.body}</p>
             </div>
           ))}
         </div>
@@ -181,8 +181,8 @@ function HowItWorksPage() {
         </div>
 
         <div className="surface-card glow-lime space-y-4 p-6 text-center">
-          <h2 className="font-display text-xl font-bold">ready to turn studying into a game?</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="type-section-title">ready to turn studying into a game?</h2>
+          <p className="type-body">
             Upload your first PDF and see what the AI cooks up.
           </p>
           <Link

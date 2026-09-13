@@ -16,6 +16,7 @@ import {
   Target,
   Timer,
   Type,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { checkDescriptiveAnswer, type AnswerCheckResult } from "@/lib/answercheck.functions";
@@ -338,22 +339,31 @@ function DescriptiveAnswerCheckPage() {
   return (
     <main className="min-h-screen px-4 pb-16 pt-5 sm:px-6 sm:pt-8">
       <div className="mx-auto w-full max-w-3xl">
-        <header className="mb-6 flex items-center justify-between gap-3">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Back to app</span>
+        <header className="mb-6 flex items-center justify-between gap-3 sm:mb-10">
+          <Link to="/" className="flex min-w-0 items-center gap-2">
+            <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground sm:size-10 sm:rounded-2xl">
+              <Zap className="size-4 sm:size-5" />
+            </span>
+            <span className="truncate font-display text-lg font-bold sm:text-xl">QuizLab</span>
           </Link>
-          {!writing && (
-            <ShareDialog
-              url={URL}
-              title={TITLE}
-              text="Get your descriptive answers marked by AI 📝"
-              label="Share"
-            />
-          )}
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            {!writing && (
+              <ShareDialog
+                url={URL}
+                title={TITLE}
+                text="Get your descriptive answers marked by AI 📝"
+                label="Share"
+              />
+            )}
+            <Link
+              to="/"
+              aria-label="Back to app"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:border-0 sm:px-0 sm:py-0 sm:text-sm"
+            >
+              <ArrowLeft className="size-4" />
+              <span className="hidden sm:inline">Back to app</span>
+            </Link>
+          </div>
         </header>
 
         {!writing && (
@@ -362,10 +372,10 @@ function DescriptiveAnswerCheckPage() {
               <Sparkles className="h-3.5 w-3.5 text-primary" />
               answer checker
             </span>
-            <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
+            <h1 className="type-page-title mt-3">
               <span className="text-hype">Descriptive answer check</span>
             </h1>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
+            <p className="type-lead mx-auto mt-2 max-w-xl">
               Drop a question and your answer — get marks, a criteria breakdown and the points you
               missed. Or go exam mode: timer on, paste off.
             </p>
@@ -795,7 +805,7 @@ function DescriptiveAnswerCheckPage() {
         {/* ---------- features ---------- */}
         {!writing && (
           <section className="mt-10">
-            <h2 className="mb-4 text-center text-lg font-bold">why it slaps</h2>
+            <h2 className="type-section-title mb-4 text-center">why it slaps</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {FEATURES.map((f) => (
                 <div
@@ -803,8 +813,8 @@ function DescriptiveAnswerCheckPage() {
                   className="surface-card p-4 transition-transform hover:-translate-y-0.5"
                 >
                   <f.icon className="h-5 w-5 text-primary" />
-                  <h3 className="mt-2 text-sm font-bold text-foreground">{f.title}</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{f.body}</p>
+                  <h3 className="type-card-title mt-2">{f.title}</h3>
+                  <p className="type-body mt-1">{f.body}</p>
                 </div>
               ))}
             </div>
@@ -814,8 +824,8 @@ function DescriptiveAnswerCheckPage() {
         {!writing && (
           <section id="marking-guide" className="mt-10 scroll-mt-6">
             <div className="mb-4 text-center">
-              <h2 className="text-lg font-bold">marking guide</h2>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <h2 className="type-section-title">marking guide</h2>
+              <p className="type-body mt-1">
                 See what each evaluation weight looks for in your answer.
               </p>
             </div>
