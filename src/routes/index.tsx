@@ -295,12 +295,12 @@ function Index() {
       {stage === "upload" && (
         <section className="space-y-8">
           <div className="space-y-3 text-center">
-            <h1 className="font-display text-4xl font-bold leading-[1.05] sm:text-6xl">
+            <h1 className="type-page-title">
               drop a PDF.
               <br />
               <span className="text-hype">get quizzed.</span>
             </h1>
-            <p className="mx-auto max-w-md text-muted-foreground">
+            <p className="type-lead mx-auto max-w-md">
               Your notes go in, an AI-built quiz comes out — with timers, streaks and
               feedback that actually explains stuff.
             </p>
@@ -337,7 +337,7 @@ function Index() {
           </div>
 
           <div className="surface-card space-y-7 p-5 sm:p-6">
-            <h2 className="font-display text-lg font-bold">Quiz settings</h2>
+            <h2 className="type-card-title">Quiz settings</h2>
 
             <SettingRow icon={<Target className="size-4" />} label="Questions" value={`${count}`}>
               <Slider
@@ -546,10 +546,10 @@ function FeaturesMini() {
   return (
     <div className="surface-card space-y-5 p-5 sm:p-6">
       <div className="text-center">
-        <h2 className="font-display text-xl font-bold">
+        <h2 className="type-section-title">
           why it <span className="text-hype">slaps</span>
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="type-body mt-1">
           features that make studying feel like a game
         </p>
       </div>
@@ -559,8 +559,8 @@ function FeaturesMini() {
             <span className="mb-2 grid size-9 place-items-center rounded-xl bg-accent/10 text-accent">
               <f.icon className="size-5" />
             </span>
-            <h3 className="font-display text-sm font-bold">{f.title}</h3>
-            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{f.body}</p>
+            <h3 className="type-card-title">{f.title}</h3>
+            <p className="type-body mt-1">{f.body}</p>
           </div>
         ))}
       </div>
@@ -572,10 +572,10 @@ function HowItWorksMini() {
   return (
     <div className="surface-card space-y-5 p-5 sm:p-6">
       <div className="text-center">
-        <h2 className="font-display text-xl font-bold">
+        <h2 className="type-section-title">
           how it <span className="text-hype">works</span>
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="type-body mt-1">
           from PDF to game-mode studying in four taps
         </p>
       </div>
@@ -586,8 +586,8 @@ function HowItWorksMini() {
               <step.icon className="size-5" />
             </span>
             <div>
-              <h3 className="font-display text-sm font-bold">{step.title}</h3>
-              <p className="text-xs leading-relaxed text-muted-foreground">{step.body}</p>
+              <h3 className="type-card-title">{step.title}</h3>
+              <p className="type-body mt-1">{step.body}</p>
             </div>
           </div>
         ))}
@@ -627,10 +627,10 @@ function TestimonialsMini() {
   return (
     <div className="surface-card space-y-5 p-5 sm:p-6">
       <div className="text-center">
-        <h2 className="font-display text-xl font-bold">
+        <h2 className="type-section-title">
           the <span className="text-hype">vibe check</span>
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="type-body mt-1">
           real students who turned their notes into a game
         </p>
       </div>

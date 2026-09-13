@@ -116,10 +116,10 @@ function FaqPage() {
 
       <section className="space-y-8">
         <div className="space-y-3 text-center">
-          <h1 className="font-display text-4xl font-bold leading-[1.05] sm:text-5xl">
+          <h1 className="type-page-title">
             questions? <span className="text-hype">answered.</span>
           </h1>
-          <p className="mx-auto max-w-md text-muted-foreground">
+          <p className="type-lead mx-auto max-w-md">
             Everything you need to know about PDFs, quizzes, and fact-checks.
           </p>
         </div>
@@ -134,7 +134,7 @@ function FaqPage() {
                 <span className="grid size-9 place-items-center rounded-xl bg-accent/10 text-accent">
                   <faq.icon className="size-5" />
                 </span>
-                <span className="flex-1 font-display text-base font-bold sm:text-lg">
+                <span className="type-card-title flex-1">
                   {faq.question}
                 </span>
                 <span className="ml-2 text-muted-foreground transition-transform group-open:rotate-180">
@@ -142,7 +142,7 @@ function FaqPage() {
                 </span>
               </summary>
               <div className="px-5 pb-5 pt-0">
-                <p className="pl-12 text-sm leading-relaxed text-muted-foreground">
+                <p className="type-body pl-12">
                   {faq.answer}
                 </p>
               </div>
@@ -151,8 +151,8 @@ function FaqPage() {
         </div>
 
         <div className="surface-card glow-lime space-y-4 p-6 text-center">
-          <h2 className="font-display text-xl font-bold">still curious?</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="type-section-title">still curious?</h2>
+          <p className="type-body">
             The fastest way to learn is to try it. Upload a PDF and see the magic.
           </p>
           <Link

@@ -362,10 +362,10 @@ function DescriptiveAnswerCheckPage() {
               <Sparkles className="h-3.5 w-3.5 text-primary" />
               answer checker
             </span>
-            <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
+            <h1 className="type-page-title mt-3">
               <span className="text-hype">Descriptive answer check</span>
             </h1>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
+            <p className="type-lead mx-auto mt-2 max-w-xl">
               Drop a question and your answer — get marks, a criteria breakdown and the points you
               missed. Or go exam mode: timer on, paste off.
             </p>
@@ -795,7 +795,7 @@ function DescriptiveAnswerCheckPage() {
         {/* ---------- features ---------- */}
         {!writing && (
           <section className="mt-10">
-            <h2 className="mb-4 text-center text-lg font-bold">why it slaps</h2>
+            <h2 className="type-section-title mb-4 text-center">why it slaps</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {FEATURES.map((f) => (
                 <div
@@ -803,8 +803,8 @@ function DescriptiveAnswerCheckPage() {
                   className="surface-card p-4 transition-transform hover:-translate-y-0.5"
                 >
                   <f.icon className="h-5 w-5 text-primary" />
-                  <h3 className="mt-2 text-sm font-bold text-foreground">{f.title}</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{f.body}</p>
+                  <h3 className="type-card-title mt-2">{f.title}</h3>
+                  <p className="type-body mt-1">{f.body}</p>
                 </div>
               ))}
             </div>
@@ -814,8 +814,8 @@ function DescriptiveAnswerCheckPage() {
         {!writing && (
           <section id="marking-guide" className="mt-10 scroll-mt-6">
             <div className="mb-4 text-center">
-              <h2 className="text-lg font-bold">marking guide</h2>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <h2 className="type-section-title">marking guide</h2>
+              <p className="type-body mt-1">
                 See what each evaluation weight looks for in your answer.
               </p>
             </div>

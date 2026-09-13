@@ -251,10 +251,10 @@ function StudyGuideGeneratorPage() {
               <Sparkles className="size-3 sm:size-3.5" />
               Free · no signup
             </span>
-            <h1 className="font-display text-2xl font-bold leading-[1.05] sm:text-5xl">
+            <h1 className="type-page-title">
               study guide <span className="text-hype">generator</span>
             </h1>
-            <p className="mx-auto max-w-lg text-xs text-muted-foreground sm:text-base">
+            <p className="type-lead mx-auto max-w-lg">
               Tell it your exam, your syllabus and how many hours you actually have. Get a
               week-by-week timetable with topics to cover, colour-coded priorities and revision
               checkboxes — downloadable as a PDF.
@@ -443,10 +443,10 @@ function StudyGuideGeneratorPage() {
 
           <section className="mt-8 space-y-4 sm:mt-12 sm:space-y-5">
             <div className="text-center">
-              <h2 className="font-display text-xl font-bold sm:text-2xl">
+              <h2 className="type-section-title">
                 why it's <span className="text-hype">actually useful</span>
               </h2>
-              <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
+              <p className="type-body mt-1">
                 built for real exam prep, not just a pretty calendar
               </p>
             </div>
@@ -459,20 +459,20 @@ function StudyGuideGeneratorPage() {
                   <span className="mb-2 grid size-9 place-items-center rounded-xl bg-accent/10 text-accent">
                     <f.icon className="size-5" />
                   </span>
-                  <h3 className="font-display text-sm font-bold sm:text-base">{f.title}</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{f.body}</p>
+                  <h3 className="type-card-title">{f.title}</h3>
+                  <p className="type-body mt-1">{f.body}</p>
                 </div>
               ))}
             </div>
           </section>
 
           <section className="mt-8 space-y-3 sm:mt-12 sm:space-y-4">
-            <h2 className="font-display text-xl font-bold sm:text-2xl">questions people ask</h2>
+            <h2 className="type-section-title">questions people ask</h2>
             <div className="space-y-2.5 sm:space-y-3">
               {faqs.map((f) => (
                 <div key={f.q} className="surface-card space-y-1.5 p-4 sm:space-y-2 sm:p-5">
-                  <h3 className="font-display text-sm font-bold sm:text-base">{f.q}</h3>
-                  <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">{f.a}</p>
+                  <h3 className="type-card-title">{f.q}</h3>
+                  <p className="type-body">{f.a}</p>
                 </div>
               ))}
             </div>
@@ -523,7 +523,7 @@ function PlanView({
   return (
     <div className="space-y-4 sm:space-y-6">
       <section className="surface-card glow-lime space-y-3 p-4 sm:space-y-4 sm:p-6">
-        <h1 className="font-display text-xl font-bold sm:text-3xl">{plan.title}</h1>
+        <h1 className="type-section-title">{plan.title}</h1>
         <div className="grid grid-cols-2 gap-1.5 text-center sm:grid-cols-4 sm:gap-2">
           {[
             { label: "exam", value: exam },
@@ -588,7 +588,7 @@ function PlanView({
 
       {plan.strategy.length > 0 && (
         <section className="surface-card space-y-2 p-4 sm:p-5">
-          <h2 className="font-display text-base font-bold sm:text-lg">the game plan</h2>
+          <h2 className="type-card-title">the game plan</h2>
           <ul className="space-y-1.5">
             {plan.strategy.map((s) => (
               <li key={s} className="flex gap-2 text-xs text-muted-foreground sm:text-sm">
