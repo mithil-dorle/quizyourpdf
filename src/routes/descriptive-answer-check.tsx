@@ -294,6 +294,7 @@ function DescriptiveAnswerCheckPage() {
           maxMarks: marks,
           wordLimit: limit,
           mode,
+          weights,
           ...(timeTaken !== undefined ? { timeTakenSeconds: timeTaken } : {}),
         },
       });
@@ -301,7 +302,7 @@ function DescriptiveAnswerCheckPage() {
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
     } catch (err) {
       console.error(err);
-      toast.error("Couldn't check that answer. Try again.");
+      toast.error(err instanceof Error ? err.message : "Couldn't check that answer. Try again.");
     } finally {
       setLoading(false);
     }
