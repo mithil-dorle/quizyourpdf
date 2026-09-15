@@ -209,6 +209,7 @@ function EvaluationRadar({ breakdown }: { breakdown: AnswerCheckResult["breakdow
     breakdown
       .map((_, index) => radarPoint(index, breakdown.length, fraction * 100, 100, r, cx, cy).join(","))
       .join(" ");
+  const pillarColor = (index: number) => WEIGHT_META[index]?.color ?? "var(--primary)";
 
   if (breakdown.length < 3) return null;
 
@@ -226,7 +227,7 @@ function EvaluationRadar({ breakdown }: { breakdown: AnswerCheckResult["breakdow
           ))}
           {breakdown.map((item, index) => {
             const [x, y] = radarPoint(index, breakdown.length, 100, 100, r, cx, cy);
-            return <line key={item.criterion} x1={cx} y1={cy} x2={x} y2={y} stroke="var(--border)" strokeWidth="1" />;
+            return <line key={item.criterion} x1={cx} y1={cy} x2={x} y2={y} stroke={pillarColor(index)} strokeOpacity="0.55" strokeWidth="1.5" />;
           })}
           <polygon
             points={points(expected)}
@@ -235,20 +236,34 @@ function EvaluationRadar({ breakdown }: { breakdown: AnswerCheckResult["breakdow
             strokeWidth="2"
             strokeDasharray="6 5"
           />
-          <polygon
-            points={points(achieved)}
-            fill="oklch(0.88 0.24 128 / 25%)"
-            stroke="var(--primary)"
-            strokeWidth="2.5"
-          />
+          {achieved.map((value, index) => {
+            const current = radarPoint(index, breakdown.length, value, 100, r, cx, cy);
+            const nextIndex = (index + 1) % breakdown.length;
+            const next = radarPoint(nextIndex, breakdown.length, achieved[nextIndex] ?? 0, 100, r, cx, cy);
+            return (
+              <polygon
+                key={`segment-${breakdown[index]?.criterion ?? index}`}
+                points={`${cx},${cy} ${current.join(",")} ${next.join(",")}`}
+                fill={pillarColor(index)}
+                fillOpacity="0.22"
+                stroke={pillarColor(index)}
+                strokeWidth="2.5"
+              />
+            );
+          })}
           {achieved.map((value, index) => {
             const [x, y] = radarPoint(index, breakdown.length, value, 100, r, cx, cy);
-            return <circle key={breakdown[index]?.criterion ?? index} cx={x} cy={y} r="4" fill="var(--primary)" />;
+            return <circle key={breakdown[index]?.criterion ?? index} cx={x} cy={y} r="4" fill={pillarColor(index)} />;
           })}
         </svg>
         <div className="mt-2 flex flex-wrap justify-center gap-4 text-xs font-semibold">
-          <span className="inline-flex items-center gap-1.5 text-primary">
-            <span className="size-2.5 rounded-full bg-primary" /> Your answer
+          <span className="inline-flex items-center gap-1.5 text-foreground">
+            <span className="flex gap-0.5">
+              {WEIGHT_META.map((pillar) => (
+                <span key={pillar.key} className="size-2 rounded-full" style={{ backgroundColor: pillar.color }} />
+              ))}
+            </span>
+            Your answer
           </span>
           <span className="inline-flex items-center gap-1.5 text-info">
             <span className="h-0 w-5 border-t-2 border-dashed border-info" /> Expected
@@ -258,8 +273,11 @@ function EvaluationRadar({ breakdown }: { breakdown: AnswerCheckResult["breakdow
       <div className="space-y-2">
         {breakdown.map((item, index) => (
           <div key={item.criterion} className="flex items-center justify-between gap-3 rounded-lg bg-background/45 px-3 py-2 text-xs">
-            <span className="min-w-0 font-semibold text-foreground">{item.criterion}</span>
-            <span className="shrink-0 font-bold tabular-nums text-primary">{Math.round(achieved[index] ?? 0)}%</span>
+            <span className="flex min-w-0 items-center gap-2 font-semibold text-foreground">
+              <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: pillarColor(index) }} />
+              {item.criterion}
+            </span>
+            <span className="shrink-0 font-bold tabular-nums" style={{ color: pillarColor(index) }}>{Math.round(achieved[index] ?? 0)}%</span>
           </div>
         ))}
       </div>
