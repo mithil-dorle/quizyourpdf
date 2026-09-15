@@ -243,7 +243,7 @@ function EvaluationRadar({ breakdown }: { breakdown: AnswerCheckResult["breakdow
           />
           {achieved.map((value, index) => {
             const [x, y] = radarPoint(index, breakdown.length, value, 100, r, cx, cy);
-            return <circle key={breakdown[index].criterion} cx={x} cy={y} r="4" fill="var(--primary)" />;
+            return <circle key={breakdown[index]?.criterion ?? index} cx={x} cy={y} r="4" fill="var(--primary)" />;
           })}
         </svg>
         <div className="mt-2 flex flex-wrap justify-center gap-4 text-xs font-semibold">
@@ -259,7 +259,7 @@ function EvaluationRadar({ breakdown }: { breakdown: AnswerCheckResult["breakdow
         {breakdown.map((item, index) => (
           <div key={item.criterion} className="flex items-center justify-between gap-3 rounded-lg bg-background/45 px-3 py-2 text-xs">
             <span className="min-w-0 font-semibold text-foreground">{item.criterion}</span>
-            <span className="shrink-0 font-bold tabular-nums text-primary">{Math.round(achieved[index])}%</span>
+            <span className="shrink-0 font-bold tabular-nums text-primary">{Math.round(achieved[index] ?? 0)}%</span>
           </div>
         ))}
       </div>
