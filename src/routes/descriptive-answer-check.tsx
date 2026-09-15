@@ -7,7 +7,10 @@ import {
   CheckCircle2,
   Clock,
   Gauge,
+  Eye,
+  EyeOff,
   Loader2,
+  MinusCircle,
   PenLine,
   RotateCcw,
   SlidersHorizontal,
@@ -191,6 +194,79 @@ function WeightRadar({ weights }: { weights: Weights }) {
   );
 }
 
+function EvaluationRadar({ breakdown }: { breakdown: AnswerCheckResult["breakdown"] }) {
+  const size = 280;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 112;
+  const expected = breakdown.map(() => 100);
+  const achieved = breakdown.map((item) =>
+    item.outOf > 0 ? Math.max(0, Math.min(100, (item.score / item.outOf) * 100)) : 0,
+  );
+  const points = (values: number[]) =>
+    values.map((value, index) => radarPoint(index, breakdown.length, value, 100, r, cx, cy).join(",")).join(" ");
+  const ring = (fraction: number) =>
+    breakdown
+      .map((_, index) => radarPoint(index, breakdown.length, fraction * 100, 100, r, cx, cy).join(","))
+      .join(" ");
+
+  if (breakdown.length < 3) return null;
+
+  return (
+    <div className="grid items-center gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+      <div>
+        <svg
+          viewBox={`0 0 ${size} ${size}`}
+          className="mx-auto w-full max-w-[280px]"
+          role="img"
+          aria-label="Radar graph comparing the expected standard with the student's answer"
+        >
+          {[0.25, 0.5, 0.75, 1].map((fraction) => (
+            <polygon key={fraction} points={ring(fraction)} fill="none" stroke="var(--border)" strokeWidth="1" />
+          ))}
+          {breakdown.map((item, index) => {
+            const [x, y] = radarPoint(index, breakdown.length, 100, 100, r, cx, cy);
+            return <line key={item.criterion} x1={cx} y1={cy} x2={x} y2={y} stroke="var(--border)" strokeWidth="1" />;
+          })}
+          <polygon
+            points={points(expected)}
+            fill="oklch(0.78 0.16 210 / 8%)"
+            stroke="var(--info)"
+            strokeWidth="2"
+            strokeDasharray="6 5"
+          />
+          <polygon
+            points={points(achieved)}
+            fill="oklch(0.88 0.24 128 / 25%)"
+            stroke="var(--primary)"
+            strokeWidth="2.5"
+          />
+          {achieved.map((value, index) => {
+            const [x, y] = radarPoint(index, breakdown.length, value, 100, r, cx, cy);
+            return <circle key={breakdown[index].criterion} cx={x} cy={y} r="4" fill="var(--primary)" />;
+          })}
+        </svg>
+        <div className="mt-2 flex flex-wrap justify-center gap-4 text-xs font-semibold">
+          <span className="inline-flex items-center gap-1.5 text-primary">
+            <span className="size-2.5 rounded-full bg-primary" /> Your answer
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-info">
+            <span className="h-0 w-5 border-t-2 border-dashed border-info" /> Expected
+          </span>
+        </div>
+      </div>
+      <div className="space-y-2">
+        {breakdown.map((item, index) => (
+          <div key={item.criterion} className="flex items-center justify-between gap-3 rounded-lg bg-background/45 px-3 py-2 text-xs">
+            <span className="min-w-0 font-semibold text-foreground">{item.criterion}</span>
+            <span className="shrink-0 font-bold tabular-nums text-primary">{Math.round(achieved[index])}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function DescriptiveAnswerCheckPage() {
   const [mode, setMode] = useState<Mode>("check");
 
@@ -247,6 +323,7 @@ function DescriptiveAnswerCheckPage() {
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AnswerCheckResult | null>(null);
+  const [showModelAnswer, setShowModelAnswer] = useState(false);
   const resultRef = useRef<HTMLDivElement | null>(null);
   const submitRef = useRef<(auto?: boolean) => void>(() => {});
 
@@ -286,6 +363,7 @@ function DescriptiveAnswerCheckPage() {
     }
     setLoading(true);
     setResult(null);
+    setShowModelAnswer(false);
     try {
       const res = await checkDescriptiveAnswer({
         data: {
@@ -715,30 +793,47 @@ function DescriptiveAnswerCheckPage() {
 
             {result.breakdown.length > 0 && (
               <div className="surface-card p-4 sm:p-6">
-                <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
-                  marks breakdown
-                </h2>
-                <div className="space-y-3">
+                <div className="mb-4">
+                  <h2 className="type-section-title">expectation vs your answer</h2>
+                  <p className="type-body mt-1">See where your response met the full-mark standard in each pillar.</p>
+                </div>
+                <EvaluationRadar breakdown={result.breakdown} />
+              </div>
+            )}
+
+            {result.breakdown.length > 0 && (
+              <div className="surface-card p-4 sm:p-6">
+                <div className="mb-3">
+                  <h2 className="type-section-title">where marks were deducted</h2>
+                  <p className="type-body mt-1">Open any pillar for the evaluator's reason.</p>
+                </div>
+                <div className="space-y-2">
                   {result.breakdown.map((b, i) => (
-                    <div key={i}>
-                      <div className="flex items-center justify-between gap-3 text-sm">
-                        <span className="font-semibold text-foreground">{b.criterion}</span>
-                        <span className="shrink-0 font-bold tabular-nums text-primary">
-                          {b.score}/{b.outOf}
-                        </span>
+                    <details key={i} className="group overflow-hidden rounded-xl border border-border bg-background/35">
+                      <summary className="cursor-pointer list-none p-3 [&::-webkit-details-marker]:hidden">
+                        <div className="flex items-center justify-between gap-3 text-sm">
+                          <span className="font-semibold text-foreground">{b.criterion}</span>
+                          <span className="flex shrink-0 items-center gap-2">
+                            <span className="font-bold tabular-nums text-primary">{b.score}/{b.outOf}</span>
+                            <ChevronDown className="size-4 text-muted-foreground transition-transform group-open:rotate-180" />
+                          </span>
+                        </div>
+                        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-full rounded-full bg-primary"
+                            style={{ width: `${b.outOf > 0 ? Math.min(100, (b.score / b.outOf) * 100) : 0}%` }}
+                          />
+                        </div>
+                      </summary>
+                      <div className="border-t border-border px-3 py-3">
+                        <p className="inline-flex items-center gap-1.5 text-xs font-bold text-destructive">
+                          <MinusCircle className="size-3.5" /> {Number(Math.max(0, b.outOf - b.score).toFixed(2))} marks deducted
+                        </p>
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                          {b.comment || "No additional deduction reason was provided."}
+                        </p>
                       </div>
-                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full rounded-full bg-primary"
-                          style={{
-                            width: `${b.outOf > 0 ? Math.min(100, (b.score / b.outOf) * 100) : 0}%`,
-                          }}
-                        />
-                      </div>
-                      {b.comment && (
-                        <p className="mt-1 text-xs text-muted-foreground">{b.comment}</p>
-                      )}
-                    </div>
+                    </details>
                   ))}
                 </div>
               </div>
@@ -757,7 +852,7 @@ function DescriptiveAnswerCheckPage() {
               )}
               {result.improvements.length > 0 && (
                 <div className="surface-card p-4">
-                  <h2 className="mb-2 text-sm font-bold text-warning">fix this next time</h2>
+                  <h2 className="mb-2 text-sm font-bold text-warning">scope for improvement</h2>
                   <ul className="space-y-1.5 text-sm text-muted-foreground">
                     {result.improvements.map((s, i) => (
                       <li key={i}>• {s}</li>
@@ -780,12 +875,26 @@ function DescriptiveAnswerCheckPage() {
 
             {result.modelAnswer && (
               <div className="surface-card p-4 sm:p-6">
-                <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted-foreground">
-                  model answer
-                </h2>
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-                  {result.modelAnswer}
-                </p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="type-card-title">model answer</h2>
+                    <p className="type-caption mt-1">Compare only after reviewing your deductions and missed points.</p>
+                  </div>
+                  <button
+                    type="button"
+                    aria-expanded={showModelAnswer}
+                    onClick={() => setShowModelAnswer((shown) => !shown)}
+                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground"
+                  >
+                    {showModelAnswer ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    {showModelAnswer ? "Hide model answer" : "Show model answer"}
+                  </button>
+                </div>
+                {showModelAnswer && (
+                  <div className="mt-4 border-t border-border pt-4">
+                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">{result.modelAnswer}</p>
+                  </div>
+                )}
               </div>
             )}
 
